@@ -11,3 +11,6 @@ __pycache__/
 .handoffs/
 .plans/
 .research/
+
+# Codex-managed system skills — auto-synced by Codex CLI, not hand-authored
+skills/.system/
