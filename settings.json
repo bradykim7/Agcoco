@@ -47,7 +47,15 @@
     "vercel@claude-plugins-official": false,
     "claude-md-management@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "learning-opportunities": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/DrCatHicks/learning-opportunities.git"
+      }
+    }
+  },
   "effortLevel": "xhigh",
-  "theme": "light-daltonized",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "light-daltonized"
 }
