@@ -281,6 +281,7 @@ install_tool() {
 
     # 이전 sourced 값 정리
     unset TOOL_NAME TOOL_CMD TOOL_DIR
+    unset -f TOOL_SETUP 2>/dev/null || true
     TOOL_SYMLINKS=()
 
     # shellcheck source=/dev/null
@@ -290,6 +291,13 @@ install_tool() {
     if [ -z "$TOOL_NAME" ] || [ -z "$TOOL_CMD" ] || [ -z "$TOOL_DIR" ]; then
         echo "[!] $tool_basename: TOOL_NAME/CMD/DIR 누락 — 스킵"
         return
+    fi
+
+    # 선택적 setup 훅 — 감지 전에 실행. 아직 미설치인 공유 의존성(예: MCP 서버 CLI)이
+    # 스스로 설치/등록하게 함. 훅 미정의 시 아무 동작 없음(기존 툴 그대로).
+    if declare -F TOOL_SETUP >/dev/null 2>&1; then
+        echo "[*] $TOOL_NAME: setup 훅 실행"
+        TOOL_SETUP || echo "    [!] $TOOL_NAME setup 훅 실패 — 계속 진행"
     fi
 
     # 감지

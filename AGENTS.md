@@ -144,6 +144,14 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - **In `agcoco/`**: read `WORKFLOW.md` upfront before suggesting workflow changes — it's the source of truth for commands/agents/skills inventory.
 - **In a fresh project (no `AGENTS.md`/`CLAUDE.md` with `## Agent skills` block)**: suggest running `setup-matt-pocock-skills` skill first to bootstrap context for `tdd`, `triage`, `to-prd`, `to-issues`, `diagnose`, etc.
 
+## HTML / frontend design system
+
+For **any HTML/CSS/frontend UI work** (building a page, component, landing page, styling, "make this look good"), read `/Users/mskim/personal/Agcoco/DESIGN.md` first and follow its design system — color tokens, typography ladder, spacing, components, and do's/don'ts. It's the default house style.
+
+- Use the documented `{token.refs}` (e.g. `{colors.primary}`, `{typography.hero-display}`) — never inline ad-hoc hex/sizes that the spec already defines.
+- This is the default, not a straitjacket: if the user asks for a different look or the project clearly has its own system, follow that instead and say so.
+- If `DESIGN.md` isn't present at that path (different machine), skip silently — don't error.
+
 ## Proactive Obsidian saving
 
 Vault: `$OBSIDIAN_VAULT` (default `$HOME/Obsidian`) — set the env var in your shell config to override.
