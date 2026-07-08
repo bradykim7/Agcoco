@@ -55,6 +55,7 @@
     }
   },
   "effortLevel": "xhigh",
+  "ultracode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.193",
   "tui": "fullscreen",
