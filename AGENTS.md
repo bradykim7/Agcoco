@@ -66,6 +66,7 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 ### Research, debug, understanding
 - `/research` (cmd, A) — "research X", "코드베이스 조사", "어떻게 동작하는지 정리"
 - `/debug` (cmd, A) — "broad investigation", "원인 모르겠어 다 봐줘", "병렬 조사"
+- `/ask-codex` (cmd, S) — "코덱스한테도 물어봐", "교차 검증해줘", "다른 모델 의견은?", "ask codex", "second opinion" *(Claude 서브에이전트 ↔ Codex 블라인드 교차 검증. 외부 CLI 호출 + 질문 내용이 Codex로 전송됨 → 확인 후 실행)*
 - `diagnose` (skill, A) — "this is broken/throwing", "에러 난다", "diagnose this", "perf regression"
 - `zoom-out` (skill, S — manual-only) — "zoom out", "큰 그림", "bigger picture" *(can't auto-fire — must suggest)*
 - `codebase-locator` (agent, A) — "where does X live", "이 코드 어디 있어"

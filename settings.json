@@ -3,6 +3,7 @@
     "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
     "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1"
   },
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -54,12 +55,13 @@
       }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "ultracode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.193",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "theme": "light-daltonized"
+  "theme": "light-daltonized",
+  "agentPushNotifEnabled": true
 }
