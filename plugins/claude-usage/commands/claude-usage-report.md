@@ -1,6 +1,6 @@
 ---
 description: Claude Code 팀 사용 리포트 생성 — 팀원 JSON 수합 → 8개 섹션 분석 (+ 선택: Confluence 발행)
-allowed-tools: Bash(npx:*), Bash(ccusage:*), Bash(unzip:*), Bash(ls:*), Bash(mkdir:*), Bash(jq:*), Bash(date:*), Bash(test:*), Bash(find:*), Bash(cp:*), Bash(mv:*), Read, Write, Glob, Grep, Agent
+allowed-tools: Bash(npx:*), Bash(ccusage:*), Bash(unzip:*), Bash(ls:*), Bash(mkdir:*), Bash(jq:*), Bash(date:*), Bash(test:*), Bash(find:*), Bash(cp:*), Bash(mv:*), Read, Write, Glob, Grep, Agent, mcp__jira-auth-proxy__confluence_get_page, mcp__jira-auth-proxy__confluence_create_page, mcp__jira-auth-proxy__confluence_update_page
 argument-hint: <input 폴더 경로> [confluence-parent-id]
 ---
 
@@ -20,7 +20,7 @@ argument-hint: <input 폴더 경로> [confluence-parent-id]
    - 압축 해제된 `<name>/` 디렉토리 with `daily.json` / `session.json` / `monthly.json` / `meta.json`
 2. `jq` 설치
 3. 프로젝트 루트에 `.wiki-drafts/` 가 쓰기 가능
-4. (선택) Confluence 발행: `mcp__mailplug-mcp-atlassian` 설정 + 인자 2번째에 parent page ID
+4. (선택) Confluence 발행: `mcp__jira-auth-proxy` 설정 + 인자 2번째에 parent page ID
 
 ---
 
@@ -146,7 +146,7 @@ team-data/
 ```
 
 동작:
-1. `mcp__mailplug-mcp-atlassian__confluence_get_page` 로 parent 존재 확인
+1. `mcp__jira-auth-proxy__confluence_get_page` 로 parent 존재 확인
 2. 각 섹션에 대해:
    - 기존 페이지 있으면 `confluence_update_page`
    - 없으면 `confluence_create_page`

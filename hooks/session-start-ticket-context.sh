@@ -26,15 +26,6 @@ for dir in .plans .handoffs .research; do
   fi
 done
 
-testjob_dir="$HOME/workspace/testjob/$ticket"
-if [ -d "$testjob_dir" ]; then
-  status=""
-  [ -f "$testjob_dir/results/SMOKE_TEST_REPORT.md" ] && status="${status} smoke✓"
-  [ -f "$testjob_dir/results/DIFF_REPORT.md" ] && status="${status} diff✓"
-  [ -z "$status" ] && status=" (no reports yet)"
-  found+=("testjob/$ticket:$status")
-fi
-
 if [ ${#found[@]} -gt 0 ]; then
   echo "## Existing artifacts for ticket $ticket (branch: $branch)"
   echo ""

@@ -33,19 +33,19 @@ Three ways to fire a workflow — a slash command you type, a skill that auto-fi
 
 ## What's Included
 
-### Commands (21)
+### Commands (18)
 
 | Category | Commands |
 |----------|----------|
 | **Plan Lifecycle** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
 | **Research & Debug** | `/research`, `/debug` |
 | **Session** | `/handoff`, `/resume-handoff` |
-| **Test** | `/workcheck`, `/affected-endpoints`, `/smoke-test`, `/branch-diff`, `/test-affected` |
+| **Test** | `/affected-endpoints` |
 | **Commit & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude Usage** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
 | **Jira Automation** | `/jira-daily` (+ optional `scripts/jira-daily-setup.sh` for launchd cron) |
 
-<img src="./docs/images/agcoco-05-commands.png" alt="21 workflows behind a slash" width="720">
+<img src="./docs/images/agcoco-05-commands.png" alt="18 workflows behind a slash" width="720">
 
 ### Agents (12)
 
@@ -68,7 +68,7 @@ Commands trigger these automatically — you don't call them directly.
 
 <img src="./docs/images/agcoco-06-agents.png" alt="12 specialists on Sonnet" width="720">
 
-### Skills (22)
+### Skills (21)
 
 Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). Skills auto-fire when your phrasing matches their `description` field — no slash command needed.
 
@@ -92,12 +92,11 @@ Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). Ski
 | | `migrate-to-shoehorn` | "replace `as` with shoehorn in tests" |
 | | `scaffold-exercises` | "scaffold an exercise structure" |
 | **personal** | `edit-article` | "edit/revise this article" |
-| | `obsidian-vault` | "find/create a note in Obsidian" |
 | **in-progress** | `writing-fragments` | "ideate", "fragments", "raw material" |
 | | `writing-shape` | "shape these notes into an article" |
 | | `writing-beats` | "assemble this as a narrative" |
 
-<img src="./docs/images/agcoco-07-skills.png" alt="22 habits, autoloaded" width="720">
+<img src="./docs/images/agcoco-07-skills.png" alt="21 habits, autoloaded" width="720">
 
 ### Plugins (6)
 
@@ -111,18 +110,16 @@ Commands and skills also ship as installable plugin packs in `plugins/`. Cherry-
 
 <img src="./docs/images/agcoco-08-plugins.png" alt="6 marketplace bundles" width="720">
 
-### Hooks (4)
+### Hooks (2)
 
 Non-LLM scripts that run on tool invocation or session events. The agent doesn't choose to honour them — the runtime enforces them.
 
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `block-dangerous-git.sh` | PreToolUse: Bash | Block `git commit/push/filter-repo/reset --hard` — require human approval |
-| `workcheck-reminder.sh` | PreToolUse: Bash | Warn before commit if no smoke test report exists |
 | `session-start-ticket-context.sh` | SessionStart | Auto-load `.plans/`, `.handoffs/`, `.research/` for JIRA ticket branches |
-| `obsidian-save-reminder.sh` | Stop | Nudge to save learnings to the Obsidian vault |
 
-<img src="./docs/images/agcoco-11-hooks.png" alt="4 guardrails the agent can't dodge" width="720">
+<img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
 
 ## Multi-Tool Support (`tools/` registry)
 
@@ -163,22 +160,6 @@ Plain Markdown on disk is the memory. Plans, research notes, and handoffs all li
 
 Creates `CLAUDE.md` + `.handoffs/` + `.plans/` + `.research/` in the target project.
 
-### Obsidian Vault Init
-
-Bootstraps an Obsidian vault for accumulating company knowledge + development knowledge.
-
-```bash
-./install.sh obsidian-init ~/Documents/MyVault
-```
-
-Creates a vault with:
-- Folder structure (`20-Company/` for company knowledge, `30-Development/` for general dev knowledge — kept separate)
-- 7 note templates (daily, meeting, ADR, tech knowledge, troubleshooting, glossary, weekly review)
-- Claude Code integration (`CLAUDE.md` + `.claude/commands/` with 3 slash commands)
-- Auto-configured Obsidian core plugins
-
-→ Follow the [Obsidian Onboarding Guide](docs/obsidian-onboarding.md) (10 minutes)
-
 ## Output
 
 Every workflow produces a concrete file or message — not just a chat reply. Commit messages follow team convention, PR descriptions write themselves, test reports get checked in for the next session to read.
@@ -188,15 +169,14 @@ Every workflow produces a concrete file or message — not just a chat reply. Co
 ## Docs
 
 ### Component reference
-- [Slash Commands](docs/commands.en.md) ([KR](docs/commands.kr.md)) — 21 commands grouped by category
+- [Slash Commands](docs/commands.en.md) ([KR](docs/commands.kr.md)) — 18 commands grouped by category
 - [Sub-agents](docs/agents.en.md) ([KR](docs/agents.kr.md)) — 12 specialized agents Claude spawns
-- [Hooks](docs/hooks.en.md) ([KR](docs/hooks.kr.md)) — 4 lifecycle hook scripts
+- [Hooks](docs/hooks.en.md) ([KR](docs/hooks.kr.md)) — 2 lifecycle hook scripts
 - [Scripts](docs/scripts.en.md) ([KR](docs/scripts.kr.md)) — Standalone shell helpers
 - [Plugins](docs/plugins.en.md) ([KR](docs/plugins.kr.md)) — 6 plugin marketplace bundles
 
 ### Guides
 - [Onboarding Guide](docs/onboarding.md) — Intro for first-time users
-- [Obsidian Onboarding](docs/obsidian-onboarding.md) — Step-by-step Obsidian vault setup
 - [Workflow Reference](WORKFLOW.md) — Full command & workflow reference
 - [Submodule Approach](docs/approach-a-submodule.md) — Alternative structure for team sharing
 

@@ -8,6 +8,7 @@ TOOL_DIR="$HOME/.claude"
 # 각 항목: "<target relative to TOOL_DIR>=<source relative to DOTFILES_DIR>"
 TOOL_SYMLINKS=(
     "CLAUDE.md=AGENTS.md"
+    "DESIGN.md=DESIGN.md"
     "commands=commands"
     "agents=agents/claude-code"
     "skills=skills"

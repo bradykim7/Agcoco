@@ -1,5 +1,5 @@
 {
   "name": "workflow",
-  "description": "핵심 작업 메타 커맨드. workcheck(영향분석+스모크), workfinish(커밋+PR), debug, research, handoff, resume-handoff 포함.",
+  "description": "핵심 작업 메타 커맨드. workfinish(커밋+PR), debug, research, ask-codex(Codex 교차 검증), handoff, resume-handoff 포함.",
   "version": "1.0.0"
 }

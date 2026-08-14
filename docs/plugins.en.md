@@ -18,8 +18,8 @@ The top-level [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.
 | Plugin | Contents | Purpose |
 |--------|----------|---------|
 | [`planning`](../plugins/planning/) | commands | Plan lifecycle — `create-plan`, `implement-plan`, `iterate-plan`, `validate-plan` |
-| [`workflow`](../plugins/workflow/) | commands | Core meta commands — `workcheck`, `workfinish`, `debug`, `research`, `handoff`, `resume-handoff` |
-| [`testing`](../plugins/testing/) | commands | Test & compare — `affected-endpoints`, `branch-diff`, `smoke-test`, `test-affected` |
+| [`workflow`](../plugins/workflow/) | commands | Core meta commands — `workfinish`, `debug`, `research`, `ask-codex`, `handoff`, `resume-handoff` |
+| [`testing`](../plugins/testing/) | commands | Affected-endpoint tracing — `affected-endpoints` |
 | [`git-tools`](../plugins/git-tools/) | commands + skills | Commit & PR — `commit-mailplug`, `commit-suggest`, `pr-description` + `git-guardrails`, `setup-pre-commit` |
 | [`engineering-skills`](../plugins/engineering-skills/) | skills | Engineering workflow skills — `diagnose`, `tdd`, `triage`, `to-prd`, `to-issues`, `zoom-out`, `improve-codebase-architecture`, `prototype`, `grill-with-docs`, `grill-me` |
 | [`claude-usage`](../plugins/claude-usage/) | commands | Claude Code usage analytics — `claude-usage-collect`, `claude-usage-analyze`, `claude-usage-report` |

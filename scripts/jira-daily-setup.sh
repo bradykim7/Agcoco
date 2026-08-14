@@ -57,7 +57,7 @@ info "node bin 디렉토리: $NODE_BIN_DIR"
 if [[ ! -f "$HOME/.claude/commands/jira-daily.md" ]]; then
     error "/jira-daily 슬래시 커맨드가 없습니다."
     error "Agcoco install.sh 를 먼저 실행해주세요:"
-    error "  cd ~/personal/Agcoco && ./install.sh"
+    error "  cd \"$(dirname \"$(readlink "$HOME/.claude/CLAUDE.md")\")\" && ./install.sh"
     exit 1
 fi
 info "/jira-daily 슬래시 커맨드 확인"
@@ -82,7 +82,7 @@ else
 fi
 
 # ─── 5. 작업 디렉토리 ──────────────────────────────────────
-DEFAULT_WORKDIR="$HOME/workspace/mailwork"
+DEFAULT_WORKDIR="${MAILWORK_ROOT:-$HOME/GoogleDesktop/mailwork}"
 [[ ! -d "$DEFAULT_WORKDIR" ]] && DEFAULT_WORKDIR="$PWD"
 
 echo ""

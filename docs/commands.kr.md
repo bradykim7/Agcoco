@@ -26,9 +26,6 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 | 커맨드 | 용도 |
 |--------|------|
 | [`/affected-endpoints`](../commands/affected-endpoints.md) | 코드 변경으로 영향받는 HTTP 엔드포인트 추적 |
-| [`/branch-diff`](../commands/branch-diff.md) | 브랜치 간 API 응답 비교 (master URL 패턴 기반) |
-| [`/smoke-test`](../commands/smoke-test.md) | curl 기반 스모크 테스트 실행 (Write→Verify 지원) |
-| [`/test-affected`](../commands/test-affected.md) | 영향 엔드포인트 추적 + 스모크 테스트 일괄 실행 |
 
 ### 커밋 & PR
 | 커맨드 | 용도 |
@@ -37,7 +34,6 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 | [`/commit-mailplug`](../commands/commit-mailplug.md) | 팀 컨벤션 커밋 메시지 (티켓 ID 자동 감지) |
 | [`/pr-description`](../commands/pr-description.md) | git diff 기반 PR 설명 자동 생성 |
 | [`/workfinish`](../commands/workfinish.md) | 커밋 + PR 설명 한번에 — "마무리하자" |
-| [`/workcheck`](../commands/workcheck.md) | 작업 중간 점검 — 영향 분석 + 스모크 테스트 |
 
 ### 세션
 | 커맨드 | 용도 |

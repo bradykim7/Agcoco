@@ -6,7 +6,6 @@
 
 | 커맨드 | 용도 | 입력 예시 |
 |--------|------|-----------|
-| **`/workcheck`** | 영향 분석 + 스모크 테스트 한번에 | `/workcheck` |
 | **`/workfinish`** | 커밋 추천 + PR 설명 한번에 | `/workfinish` |
 
 ### 계획 라이프사이클 커맨드
@@ -42,9 +41,6 @@
 | 커맨드 | 용도 | 입력 예시 |
 |--------|------|-----------|
 | `/affected-endpoints` | 영향 엔드포인트 추적 (읽기 전용) | `/affected-endpoints` |
-| `/test-affected` | 영향 추적 + 자동 스모크 테스트 | `/test-affected WM-XXXXX` |
-| `/smoke-test` | 수동 스모크 테스트 | `/smoke-test GET /api/v2/mail/...` |
-| `/branch-diff` | 브랜치 간 응답 비교 | `/branch-diff WM-XXXXX` |
 
 ### 커밋 & PR 커맨드
 
@@ -74,7 +70,7 @@
 
 - 사전 준비: `brew install terminal-notifier` + Jira MCP 설정
 - 계획서 저장: `$JIRA_DAILY_PLANS_DIR` env (기본 `$PWD/.plans/`)
-- 자동 스케줄 설치: `bash ~/personal/Agcoco/scripts/jira-daily-setup.sh` (대화형, 시간/디렉토리 선택)
+- 자동 스케줄 설치: `bash "$(dirname "$(readlink ~/.claude/CLAUDE.md)")/scripts/jira-daily-setup.sh"` (대화형, 시간/디렉토리 선택)
 
 ---
 
@@ -84,7 +80,6 @@
 git checkout -b feature/WM-XXXXX
 # 코드 작업...
 
-/workcheck              ← 영향 분석 + 스모크 테스트
 /workfinish             ← 커밋 + PR 설명 생성
 ```
 
@@ -102,9 +97,8 @@ git checkout -b feature/WM-XXXXX
 /implement-plan               ← 3. Phase별 구현 + 자동 검증
 /validate-plan                ← 4. 구현 결과 전체 검증
 /debug 에러 설명              ←    문제 발생 시 병렬 조사
-/workcheck                    ← 5. 영향 분석 + 스모크 테스트
-/workfinish                   ← 6. 커밋 + PR 생성
-/handoff                      ← 7. 세션 종료 시 인수인계
+/workfinish                   ← 5. 커밋 + PR 생성
+/handoff                      ← 6. 세션 종료 시 인수인계
 /resume-handoff               ←    다음 세션에서 이어서
 ```
 
@@ -202,7 +196,7 @@ Claude (Opus):
 전체 워크플로우 정의       전문 단일 작업              자동 발화 트리거
 ```
 
-### 스킬 목록 (22개)
+### 스킬 목록 (21개)
 
 | 카테고리 | 스킬 | 자동 호출 트리거 |
 |----------|------|------------------|
@@ -224,7 +218,6 @@ Claude (Opus):
 | | `migrate-to-shoehorn` | "테스트의 `as`를 shoehorn으로 바꿔줘" |
 | | `scaffold-exercises` | "exercise 구조 만들어줘" |
 | **personal** | `edit-article` | "이 글 수정/개선해줘" |
-| | `obsidian-vault` | "Obsidian에서 노트 찾기/만들기" |
 | **in-progress** | `writing-fragments` | "ideate", "fragments", "글 raw material" |
 | | `writing-shape` | "이 노트들을 글로 만들어줘" |
 | | `writing-beats` | "내러티브로 조립해줘" |
@@ -275,52 +268,7 @@ NoticeMailMemberDAO → NoticeMailService → AdminNoticeMailController
   → POST /api/v2/mail/admin/mails/notice
 ```
 
-### 3단계: 자동 스모크 테스트
-
-영향 엔드포인트를 자동으로 추적하고 스모크 테스트까지 실행:
-
-```
-/test-affected
-```
-
-수행 내용:
-1. 변경 파일 → 영향 엔드포인트 자동 추적
-2. `testjob/WM-XXXXX/TEST_ENDPOINTS.md` 자동 생성
-3. GET 엔드포인트 스모크 호출
-4. POST/PUT/DELETE는 **Write→Verify** 패턴으로 검증
-5. `testjob/WM-XXXXX/results/SMOKE_TEST_REPORT.md` 생성
-
-### 4단계: (선택) 수동 스모크 테스트
-
-특정 엔드포인트만 추가 테스트:
-
-```
-# 단일 엔드포인트
-/smoke-test GET /api/v2/mail/admin/mails/approvalfilters
-
-# POST + Write→Verify
-/smoke-test POST /api/v2/mail/admin/mails/representatives {"name":"test"}
-
-# 티켓 일괄 테스트
-/smoke-test WM-XXXXX
-```
-
-### 5단계: (선택) 브랜치 비교
-
-master 대비 응답 차이가 있는지 확인:
-
-```
-/branch-diff WM-XXXXX
-```
-
-수행 내용:
-1. Feature — `{host}/api/v2/mail/{path}` 호출
-2. Master — `{host}/master/api/v2/mail/{path}` 호출 (**서버 전환 불필요**)
-3. JSON diff 비교 → `DIFF_REPORT.md` 생성
-
-> `/workcheck`에도 master 비교가 포함되어 있으므로, workcheck만 실행해도 됩니다.
-
-### 6단계: 커밋
+### 3단계: 커밋
 
 ```
 /commit-mailplug
@@ -337,7 +285,7 @@ master 대비 응답 차이가 있는지 확인:
 2. refactor(WM-XXXXX): 자동완성 쿼리에 account_type 조건 추가
 ```
 
-### 7단계: PR 생성
+### 4단계: PR 생성
 
 ```
 /pr-description
@@ -394,91 +342,50 @@ TEST_ENDPOINTS.md에서 verify 컬럼으로 직접 지정 가능:
 
 ---
 
-## testjob 디렉토리 구조
-
-```
-~/workspace/testjob/
-├── urltest.http                    ← host·token (공용, git 제외)
-├── TESTING_RULE.md                 ← 스모크 테스트 규칙
-├── BRANCH_DIFF_TEST_RULE.md        ← 브랜치 비교 규칙
-└── {TICKET}/                       ← 티켓별 디렉토리
-    ├── TEST_ENDPOINTS.md           ← 테스트 대상 엔드포인트
-    └── results/
-        ├── run1_{desc}/            ← 브랜치 비교 run1 응답
-        ├── run2_{desc}/            ← 브랜치 비교 run2 응답
-        ├── {method}_{name}.json    ← 스모크 응답
-        ├── verify_before_{name}.json
-        ├── verify_after_{name}.json
-        ├── SMOKE_TEST_REPORT.md    ← 스모크 결과
-        └── DIFF_REPORT.md          ← 브랜치 비교 결과
-```
-
----
-
 ## 환경 설정
 
 ### dotfiles 구조
 
+리포는 어디에 클론해도 됩니다. `install.sh`가 자기 위치를 기준으로 심링크를 겁니다.
+
 ```
-~/.claude-dotfiles/          ← git repo (agcoco)
-├── commands/                ← 커스텀 커맨드 (20개)
-│   ├── create-plan.md         ← 구조적 계획 수립
-│   ├── implement-plan.md      ← 계획서 Phase별 구현
-│   ├── iterate-plan.md        ← 기존 계획서 수정
-│   ├── validate-plan.md       ← 구현 결과 검증
-│   ├── research.md            ← 코드베이스 리서치
-│   ├── debug.md               ← 구조적 디버깅
-│   ├── handoff.md             ← 세션 인수인계
-│   ├── resume-handoff.md      ← 핸드오프 재개
-│   ├── workcheck.md
-│   ├── workfinish.md
-│   ├── affected-endpoints.md
-│   ├── smoke-test.md
-│   ├── branch-diff.md
-│   ├── commit-mailplug.md
-│   ├── pr-description.md
-│   ├── commit-suggest.md
-│   ├── test-affected.md
-│   ├── claude-usage-collect.md   ← 본인 사용 데이터 수집
-│   ├── claude-usage-analyze.md   ← 개인 사용 분석 리포트
-│   └── claude-usage-report.md    ← 팀 사용 집계 리포트
-├── agents/claude-code/      ← 자동 서브에이전트 (12개)
-│   ├── codebase-analyzer.md       ← 코드 구현 분석
-│   ├── codebase-locator.md        ← 파일/컴포넌트 위치 탐색
-│   ├── codebase-pattern-finder.md ← 코드 패턴/예시 탐색
-│   ├── docs-locator.md            ← 과거 문서 탐색 (지식 검색)
-│   ├── docs-analyzer.md           ← 과거 문서 인사이트 추출
-│   ├── web-search-researcher.md   ← 웹 검색 리서치
-│   ├── architecture-review.md
-│   ├── consistency-check.md
-│   ├── document-summarizer.md
-│   ├── endpoint-analysis.md
-│   ├── pr-description-generator.md
-│   └── pr-review-assistant.md
-├── templates/               ← NEW: 프로젝트 템플릿
-│   └── CLAUDE.md.template
-├── docs/                    ← NEW: 참고 문서
-│   └── approach-a-submodule.md
-├── settings.json            ← 글로벌 설정
+<repo>/                      ← git repo (bradykim7/Agcoco)
+├── AGENTS.md                ← 글로벌 에이전트 메모리 (→ ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md)
+├── CLAUDE.md                ← AGENTS.md 심링크
+├── DESIGN.md                ← HTML/프론트엔드 디자인 시스템
+├── commands/                ← 커스텀 커맨드 → ~/.claude/commands/
+├── agents/claude-code/      ← 서브에이전트 정의 → ~/.claude/agents/
+├── skills/                  ← 스킬. <category>/<name>/SKILL.md 로 분류하고
+│                              install.sh 가 최상위에 <name> 평탄화 심링크를 생성
+├── hooks/                   ← PreToolUse / SessionStart 훅 → ~/.claude/hooks/
+├── plugins/                 ← 플러그인 마켓플레이스 배포본
+├── tools/                   ← 툴별 심링크 레지스트리 (claude.sh, codex.sh, ...)
+├── scripts/                 ← 독립 셸 헬퍼 (jira-daily-setup.sh 등)
+├── templates/               ← 프로젝트 템플릿
+├── docs/                    ← 참고 문서
+├── settings.json            ← 글로벌 설정 → ~/.claude/settings.json
 ├── install.sh               ← symlink 설치 + 프로젝트 init
-├── WORKFLOW.md              ← 이 문서
-└── .gitignore
+└── WORKFLOW.md              ← 이 문서
 ```
+
+커맨드/에이전트 인벤토리는 위 표들이 정본입니다. 여기서 중복 나열하지 않습니다.
 
 ### 새 환경 설정 (dev server 등)
 
 ```bash
-git clone git@github.com:{repo}/claude-dotfiles.git ~/.claude-dotfiles
-cd ~/.claude-dotfiles
+git clone https://github.com/bradykim7/Agcoco.git ~/Agcoco
+cd ~/Agcoco
 ./install.sh
 ```
 
 ### 커맨드 추가/수정 후 동기화
 
 ```bash
-cd ~/.claude-dotfiles
+cd <repo>
 git add -A && git commit -m "update commands" && git push
 
 # dev server에서:
-cd ~/.claude-dotfiles && git pull
+cd <repo> && git pull
 ```
+
+심링크 방식이라 `git pull` 이후 재설치는 필요 없습니다. 단, **파일을 새로 추가하거나 스킬 디렉토리를 옮겼다면** `./install.sh`를 다시 돌려야 심링크가 갱신됩니다.

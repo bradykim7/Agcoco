@@ -1,4 +1,0 @@
-@host_mail = https://your-mail-server.example.com
-@host_member = https://your-member-server.example.com
-@token = YOUR_JWT_TOKEN_HERE
-@env = prod

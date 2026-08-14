@@ -15,9 +15,7 @@
 | 스크립트 | 이벤트 | 유형 | 용도 |
 |----------|--------|------|------|
 | [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **블로킹** | `git commit`, `git push`, `git filter-repo`, `git reset --hard` 등 거부 — 사람 승인 필요 |
-| [`workcheck-reminder.sh`](../hooks/workcheck-reminder.sh) | PreToolUse: Bash | 경고 (비차단) | `git commit` 전, 현재 티켓에 스모크 테스트 리포트 없으면 경고 — `/workcheck` 후 진행 권장 |
 | [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | 컨텍스트 주입 | 브랜치가 JIRA 티켓 패턴이면 `.plans/`, `.handoffs/`, `.research/`, `testjob/<ticket>/` 자료 자동 노출 |
-| [`obsidian-save-reminder.sh`](../hooks/obsidian-save-reminder.sh) | Stop | 컨텍스트 주입 | Claude 응답 종료 후, 의미 있는 학습은 Obsidian 볼트에 저장하도록 힌트 |
 
 ## Hook 이벤트 모델 (요약)
 
@@ -54,6 +52,4 @@
 ## 이 hook 들이 존재하는 이유
 
 - **`block-dangerous-git.sh`** — 글로벌 메모리 규칙: git commit / push 는 사람 승인 필요. 세션 프롬프트가 잊어도 hook 이 강제.
-- **`workcheck-reminder.sh`** — 티켓 작업 중 스모크 테스트 흔적 없이 커밋되는 것 방지.
 - **`session-start-ticket-context.sh`** — 사용자가 매번 연결 자료 첨부할 필요 없이 티켓 컨텍스트 자동 복원.
-- **`obsidian-save-reminder.sh`** — 지식이 채팅 히스토리에서 소실되지 않도록 외부화 유도.

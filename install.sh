@@ -128,66 +128,6 @@ CLAUDEEOF
         exit 0
         ;;
 
-    obsidian-init|obsidian)
-        # ─────────────────────────────────────
-        # obsidian-init: Obsidian vault 부트스트랩
-        # ─────────────────────────────────────
-        VAULT_PATH="${2:-}"
-        if [ -z "$VAULT_PATH" ]; then
-            echo "사용법: ./install.sh obsidian-init <vault-path>"
-            echo "예시: ./install.sh obsidian-init ~/Documents/MyVault"
-            exit 1
-        fi
-
-        VAULT_PATH="${VAULT_PATH/#\~/$HOME}"
-        SOURCE="$DOTFILES_DIR/templates/obsidian/vault"
-
-        echo "=== Obsidian Vault Bootstrap ==="
-        echo "소스: $SOURCE"
-        echo "대상: $VAULT_PATH"
-        echo ""
-
-        # 안전 검사
-        if [ ! -d "$SOURCE" ]; then
-            echo "[✗] 템플릿 소스를 찾을 수 없습니다: $SOURCE"
-            exit 1
-        fi
-
-        if [ -d "$VAULT_PATH/.obsidian" ]; then
-            echo "[!] 이미 Obsidian vault 입니다: $VAULT_PATH"
-            echo "    기존 vault는 보호됩니다. 덮어쓰려면 직접 삭제 후 재실행."
-            exit 1
-        fi
-
-        if [ -d "$VAULT_PATH" ] && [ -n "$(ls -A "$VAULT_PATH" 2>/dev/null)" ]; then
-            echo "[!] 디렉토리가 비어있지 않습니다: $VAULT_PATH"
-            echo "    안전을 위해 빈 디렉토리 또는 미존재 경로만 허용합니다."
-            exit 1
-        fi
-
-        # vault 생성
-        mkdir -p "$VAULT_PATH"
-        cp -a "$SOURCE/." "$VAULT_PATH/"
-        echo "[✓] Vault 컨텐츠 복사 완료"
-
-        # git init (선택)
-        if command -v git &>/dev/null && [ ! -d "$VAULT_PATH/.git" ]; then
-            (cd "$VAULT_PATH" && git init -q)
-            echo "[✓] git init 완료 ($VAULT_PATH/.git)"
-        fi
-
-        echo ""
-        echo "=== 다음 단계 ==="
-        echo "  1. Obsidian 앱 실행 → 'Open folder as vault' → $VAULT_PATH 선택"
-        echo "  2. Settings → Templates → Template folder location: '_templates' 확인"
-        echo "  3. Settings → Daily notes → Template: '_templates/daily-note' 확인"
-        echo "  4. 노트 작업 시: cd $VAULT_PATH && claude"
-        echo ""
-        echo "온보딩 가이드: $DOTFILES_DIR/docs/obsidian-onboarding.md"
-        echo "Vault 컨벤션:  $VAULT_PATH/CLAUDE.md"
-        exit 0
-        ;;
-
     install|"")
         # 아래 기존 install 로직으로 계속
         ;;
@@ -198,7 +138,6 @@ CLAUDEEOF
         echo "Commands:"
         echo "  install                 글로벌 설치 (기본값) — ~/.claude/ + (감지 시) ~/.codex/ symlink 생성"
         echo "  init [path]             프로젝트 초기화 — CLAUDE.md + 작업 디렉토리 생성"
-        echo "  obsidian-init <path>    Obsidian vault 부트스트랩 — 폴더 구조 + 템플릿 + Claude Code 연동"
         echo "  help                    이 도움말 표시"
         echo ""
         echo "멀티툴 지원:"
@@ -211,7 +150,6 @@ CLAUDEEOF
         echo "  ./install.sh                                    # 글로벌 설치"
         echo "  ./install.sh init .                             # 현재 디렉토리 프로젝트 초기화"
         echo "  ./install.sh init ~/my-project                  # 특정 프로젝트 초기화"
-        echo "  ./install.sh obsidian-init ~/Documents/MyVault  # Obsidian vault 생성"
         exit 0
         ;;
 
@@ -255,6 +193,48 @@ fi
 
 echo "[✓] Claude Code: $(claude --version 2>/dev/null || echo 'installed')"
 echo ""
+
+# ─────────────────────────────────────────────
+# Step 1.5: skills/ 평탄화 심링크 재생성
+# ─────────────────────────────────────────────
+# Claude Code / Codex 는 <skills-dir>/<name>/SKILL.md 딱 한 단계만 탐색한다.
+# 리포는 skills/<category>/<name>/ 로 분류해두므로 그대로 두면 카테고리 디렉토리가
+# 스킬 이름 자리를 차지해 아무것도 발견되지 않는다. 최상위에 이름별 심링크를
+# 만들어 분류와 탐색을 동시에 만족시킨다.
+#   - 상대 심링크라 리포에 커밋되며 다른 머신에서도 그대로 동작
+#   - Step 2 에서 skills/ 디렉토리 전체를 심링크하므로 Claude/Codex 양쪽에 함께 적용됨
+#   - `.system/` 은 Claude 가 관리하는 내부 스킬이라 건드리지 않음 (글롭이 dotfile 미매치)
+SKILLS_DIR="$DOTFILES_DIR/skills"
+if [ -d "$SKILLS_DIR" ]; then
+    echo "[*] skills/ 평탄화 심링크 재생성"
+
+    # 기존 최상위 심링크 정리 — 스킬 이름이 바뀌거나 삭제됐을 때 유령 링크가 남지 않도록.
+    # 실제 파일(README.md, LICENSE.*)과 카테고리 디렉토리는 심링크가 아니므로 보존된다.
+    for link in "$SKILLS_DIR"/*; do
+        if [ -L "$link" ]; then
+            rm "$link"
+        fi
+    done
+
+    skill_count=0
+    for skill_md in "$SKILLS_DIR"/*/*/SKILL.md; do
+        [ -f "$skill_md" ] || continue
+        skill_dir=$(dirname "$skill_md")
+        skill_name=$(basename "$skill_dir")
+        skill_category=$(basename "$(dirname "$skill_dir")")
+
+        if [ -e "$SKILLS_DIR/$skill_name" ]; then
+            echo "    [!] 이름 충돌 — 스킵: $skill_category/$skill_name"
+            continue
+        fi
+
+        ln -s "$skill_category/$skill_name" "$SKILLS_DIR/$skill_name"
+        skill_count=$((skill_count + 1))
+    done
+
+    echo "    [✓] 스킬 $skill_count 개 연결"
+    echo ""
+fi
 
 # ─────────────────────────────────────────────
 # Step 2: 멀티툴 symlink — tools/ 디렉토리의 정의 자동 로딩
@@ -351,18 +331,6 @@ for tool_file in "$TOOLS_DIR"/*.sh; do
     [ -f "$tool_file" ] && install_tool "$tool_file"
 done
 
-# ─────────────────────────────────────────────
-# Step 3: urltest.http 설정 안내
-# ─────────────────────────────────────────────
-if [ ! -f "$DOTFILES_DIR/urltest.http" ]; then
-    echo "[!] urltest.http가 없습니다. 템플릿에서 복사 후 토큰을 설정해주세요:"
-    echo "    cp $DOTFILES_DIR/urltest.http.example $DOTFILES_DIR/urltest.http"
-    echo "    vi $DOTFILES_DIR/urltest.http"
-    echo ""
-else
-    echo "[✓] urltest.http 존재 확인"
-fi
-
 echo ""
 echo "=== 설치 완료! ==="
 echo ""
@@ -381,7 +349,6 @@ echo ""
 echo "사용 가능한 커맨드:"
 echo ""
 echo "  === 워크플로우 (메타) ==="
-echo "  /workcheck          - 작업 중간 점검 (영향 분석 + 스모크 + master 비교)"
 echo "  /workfinish         - 작업 마무리 (커밋 + PR 설명)"
 echo ""
 echo "  === 계획 라이프사이클 ==="
@@ -400,9 +367,6 @@ echo "  /resume-handoff     - 핸드오프에서 작업 재개"
 echo ""
 echo "  === 테스트 ==="
 echo "  /affected-endpoints - 영향받는 엔드포인트 추적"
-echo "  /smoke-test         - 스모크 테스트"
-echo "  /branch-diff        - 브랜치 간 응답 비교"
-echo "  /test-affected      - 영향 추적 + 자동 스모크"
 echo ""
 echo "  === 커밋 & PR ==="
 echo "  /commit-mailplug    - 팀 컨벤션 커밋 메시지 추천"
@@ -415,6 +379,4 @@ echo "  /claude-usage-analyze  - 본인 사용 분석 → 개인 리포트 생�
 echo "  /claude-usage-report   - 팀원 JSON 수합 → 8섹션 팀 리포트 (+Confluence 옵션)"
 echo ""
 echo "프로젝트 초기화: ./install.sh init /path/to/project"
-echo "Obsidian vault: ./install.sh obsidian-init /path/to/vault"
-echo "토큰 설정:      $DOTFILES_DIR/urltest.http"
 echo "워크플로우:     $DOTFILES_DIR/WORKFLOW.md"

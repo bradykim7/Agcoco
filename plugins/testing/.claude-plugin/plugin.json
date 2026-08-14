@@ -1,5 +1,5 @@
 {
   "name": "testing",
-  "description": "테스트 & 비교 커맨드. affected-endpoints(영향 엔드포인트 추적), branch-diff(브랜치 응답 비교), smoke-test(스모크 테스트), test-affected(영향 추적+자동 테스트) 포함.",
+  "description": "영향 엔드포인트 추적 커맨드. affected-endpoints(코드 변경으로 영향받는 HTTP 엔드포인트 추적) 포함.",
   "version": "1.0.0"
 }

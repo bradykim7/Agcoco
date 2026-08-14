@@ -9,6 +9,7 @@ Standalone shell helpers under [`scripts/`](../scripts/) — installers, setup u
 | Script | Run as | Purpose |
 |--------|--------|---------|
 | [`jira-daily-setup.sh`](../scripts/jira-daily-setup.sh) | `./scripts/jira-daily-setup.sh` | Interactive macOS LaunchAgent installer for `/jira-daily`. Schedules the command headlessly (typically twice a day) with auto-detected `HOME`, node path, and working directory. |
+| [`check-plugin-sync.sh`](../scripts/check-plugin-sync.sh) | `bash scripts/check-plugin-sync.sh` | Verifies `plugins/` copies haven't silently drifted from their `commands/` originals, and that every command is either published in a plugin or listed as deliberately unpublished. Exits 1 on unregistered drift. |
 
 ## Conventions
 

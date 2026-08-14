@@ -150,7 +150,6 @@ make lint     # 린트 통과
 
 다음 단계 추천:
 - /validate-plan — 구현 결과 전체 검증
-- /workcheck — 영향 분석 + 스모크 테스트
 - /workfinish — 커밋 + PR 생성
 ```
 

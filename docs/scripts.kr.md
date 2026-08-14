@@ -9,6 +9,7 @@
 | 스크립트 | 실행 방법 | 용도 |
 |----------|-----------|------|
 | [`jira-daily-setup.sh`](../scripts/jira-daily-setup.sh) | `./scripts/jira-daily-setup.sh` | `/jira-daily` 용 macOS LaunchAgent 대화형 설치. 자동 감지된 `HOME` · node 경로 · 작업 디렉터리로 헤드리스 스케줄링 (보통 하루 2회). |
+| [`check-plugin-sync.sh`](../scripts/check-plugin-sync.sh) | `bash scripts/check-plugin-sync.sh` | `plugins/` 사본이 `commands/` 원본에서 조용히 뒤처졌는지, 모든 커맨드가 플러그인에 배포됐거나 의도적 제외로 등록됐는지 검사. 등록되지 않은 드리프트가 있으면 종료코드 1. |
 
 ## 규칙
 

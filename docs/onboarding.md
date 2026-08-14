@@ -175,11 +175,7 @@ cd ~/agcoco
 
 | 커맨드 | 언제 쓰나 |
 |--------|----------|
-| `/workcheck` | 코드 수정 후 영향 분석 + 스모크 테스트 한번에 |
 | `/affected-endpoints` | 변경한 코드가 어떤 API에 영향 주는지 확인 |
-| `/smoke-test` | 특정 엔드포인트 수동 테스트 |
-| `/branch-diff` | master 대비 API 응답 차이 비교 |
-| `/test-affected` | 영향 엔드포인트 추적 + 자동 스모크 |
 
 ### 커밋 & PR
 
@@ -275,7 +271,6 @@ Claude (Opus):
 /resume-handoff                       ← 어제 컨텍스트 복원
 /implement-plan                       ← Phase 2 이어서 구현
 /validate-plan                        ← 구현 결과 전체 검증
-/workcheck                            ← 영향 분석 + 스모크 테스트
 /workfinish                           ← 커밋 + PR 설명 생성
 ```
 

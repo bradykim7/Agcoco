@@ -11,7 +11,7 @@ Each subfolder is a category. Each skill is a folder containing `SKILL.md` (fron
 | `engineering/` | diagnose, grill-with-docs, improve-codebase-architecture, prototype, setup-matt-pocock-skills, tdd, to-issues, to-prd, triage, zoom-out |
 | `productivity/` | caveman, grill-me, write-a-skill |
 | `misc/` | git-guardrails-claude-code, migrate-to-shoehorn, scaffold-exercises, setup-pre-commit |
-| `personal/` | edit-article, obsidian-vault |
+| `personal/` | edit-article |
 | `in-progress/` | handoff, writing-beats, writing-fragments, writing-shape |
 
 ## Install

@@ -1,7 +1,6 @@
 *.bak
 .DS_Store
 **/.DS_Store
-urltest.http
 __pycache__/
 **/__pycache__/
 *.pyc

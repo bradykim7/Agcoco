@@ -33,19 +33,19 @@ cd ~/agcoco
 
 ## 포함 내용
 
-### Commands (21개)
+### Commands (18개)
 
 | 카테고리 | 커맨드 |
 |----------|--------|
 | **계획 라이프사이클** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
 | **리서치 & 디버그** | `/research`, `/debug` |
 | **세션** | `/handoff`, `/resume-handoff` |
-| **테스트** | `/workcheck`, `/affected-endpoints`, `/smoke-test`, `/branch-diff`, `/test-affected` |
+| **테스트** | `/affected-endpoints` |
 | **커밋 & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude 사용량** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
 | **Jira 자동화** | `/jira-daily` (+ 선택적 `scripts/jira-daily-setup.sh` launchd cron) |
 
-<img src="./docs/images/agcoco-05-commands.png" alt="21 workflows behind a slash" width="720">
+<img src="./docs/images/agcoco-05-commands.png" alt="18 workflows behind a slash" width="720">
 
 ### Agents (12개)
 
@@ -68,7 +68,7 @@ cd ~/agcoco
 
 <img src="./docs/images/agcoco-06-agents.png" alt="12 specialists on Sonnet" width="720">
 
-### Skills (22개)
+### Skills (21개)
 
 [mattpocock/skills](https://github.com/mattpocock/skills) (MIT) 에서 포팅. 사용자 문구가 스킬의 `description` 필드와 매치되면 자동 발화 — 슬래시 커맨드 불필요.
 
@@ -92,12 +92,11 @@ cd ~/agcoco
 | | `migrate-to-shoehorn` | "replace `as` with shoehorn in tests" |
 | | `scaffold-exercises` | "scaffold an exercise structure" |
 | **personal** | `edit-article` | "edit/revise this article" |
-| | `obsidian-vault` | "find/create a note in Obsidian" |
 | **in-progress** | `writing-fragments` | "ideate", "fragments", "raw material" |
 | | `writing-shape` | "shape these notes into an article" |
 | | `writing-beats` | "assemble this as a narrative" |
 
-<img src="./docs/images/agcoco-07-skills.png" alt="22 habits, autoloaded" width="720">
+<img src="./docs/images/agcoco-07-skills.png" alt="21 habits, autoloaded" width="720">
 
 ### Plugins (6개)
 
@@ -111,18 +110,16 @@ cd ~/agcoco
 
 <img src="./docs/images/agcoco-08-plugins.png" alt="6 marketplace bundles" width="720">
 
-### Hooks (4개)
+### Hooks (2개)
 
 도구 호출 또는 세션 이벤트에서 실행되는 비-LLM 스크립트. 에이전트가 무시할 수 없음 — 런타임이 강제.
 
 | Hook | 이벤트 | 용도 |
 |------|--------|------|
 | `block-dangerous-git.sh` | PreToolUse: Bash | `git commit/push/filter-repo/reset --hard` 차단 — 사람 승인 필요 |
-| `workcheck-reminder.sh` | PreToolUse: Bash | 스모크 테스트 리포트 없이 커밋 시 경고 |
 | `session-start-ticket-context.sh` | SessionStart | JIRA 티켓 브랜치에서 `.plans/`, `.handoffs/`, `.research/` 자동 로드 |
-| `obsidian-save-reminder.sh` | Stop | 학습 내용 Obsidian 볼트 저장 유도 |
 
-<img src="./docs/images/agcoco-11-hooks.png" alt="4 guardrails the agent can't dodge" width="720">
+<img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
 
 ## 멀티 툴 지원 (`tools/` 레지스트리)
 
@@ -163,22 +160,6 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 
 대상 프로젝트에 `CLAUDE.md` + `.handoffs/` + `.plans/` + `.research/` 생성.
 
-### Obsidian 볼트 초기화
-
-회사 지식 + 개발 지식 축적용 Obsidian 볼트를 부트스트랩.
-
-```bash
-./install.sh obsidian-init ~/Documents/MyVault
-```
-
-생성 항목:
-- 폴더 구조 (`20-Company/` 회사 지식, `30-Development/` 개발 지식 분리)
-- 7가지 노트 템플릿 (데일리·미팅·ADR·기술 지식·트러블슈팅·용어집·주간 회고)
-- Claude Code 연동 (`CLAUDE.md` + `.claude/commands/` 슬래시 커맨드 3종)
-- Obsidian 코어 플러그인 자동 설정
-
-→ [Obsidian Onboarding Guide](docs/obsidian-onboarding.md) 따라하기 (10분)
-
 ## 출력
 
 모든 워크플로우는 채팅 답변이 아닌 구체적인 파일 또는 메시지를 생성. 커밋 메시지는 팀 컨벤션을 따르고, PR 설명은 자동 생성되며, 테스트 리포트는 다음 세션이 읽을 수 있도록 체크인.
@@ -188,15 +169,14 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 ## 문서
 
 ### 컴포넌트 레퍼런스
-- [슬래시 커맨드](docs/commands.kr.md) ([EN](docs/commands.en.md)) — 카테고리별 21개 커맨드
+- [슬래시 커맨드](docs/commands.kr.md) ([EN](docs/commands.en.md)) — 카테고리별 18개 커맨드
 - [서브 에이전트](docs/agents.kr.md) ([EN](docs/agents.en.md)) — Claude 가 spawn 하는 12개 전문 에이전트
-- [Hooks](docs/hooks.kr.md) ([EN](docs/hooks.en.md)) — 4개 라이프사이클 hook 스크립트
+- [Hooks](docs/hooks.kr.md) ([EN](docs/hooks.en.md)) — 2개 라이프사이클 hook 스크립트
 - [Scripts](docs/scripts.kr.md) ([EN](docs/scripts.en.md)) — 독립 실행 셸 헬퍼
 - [Plugins](docs/plugins.kr.md) ([EN](docs/plugins.en.md)) — 6개 플러그인 마켓플레이스 번들
 
 ### 가이드
 - [Onboarding Guide](docs/onboarding.md) — 처음 사용자를 위한 소개
-- [Obsidian Onboarding](docs/obsidian-onboarding.md) — Obsidian 볼트 단계별 셋업
 - [Workflow Reference](WORKFLOW.md) — 전체 커맨드 & 워크플로우 상세
 - [Submodule Approach](docs/approach-a-submodule.md) — 팀 공유 시 대안 구조
 

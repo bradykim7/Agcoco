@@ -15,9 +15,7 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 | Script | Event | Type | Purpose |
 |--------|-------|------|---------|
 | [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **Blocking** | Refuses `git commit`, `git push`, `git filter-repo`, `git reset --hard`, etc. — human approval required |
-| [`workcheck-reminder.sh`](../hooks/workcheck-reminder.sh) | PreToolUse: Bash | Warning (non-blocking) | Before `git commit`, warns if no smoke-test report exists for the current ticket — operator can run `/workcheck` or proceed |
 | [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | Annotates context | When branch matches a Jira-style ticket pattern, surfaces related `.plans/`, `.handoffs/`, `.research/`, `testjob/<ticket>/` artifacts |
-| [`obsidian-save-reminder.sh`](../hooks/obsidian-save-reminder.sh) | Stop | Annotates context | After Claude finishes responding, hints to consider saving significant learnings to the Obsidian vault |
 
 ## Hook event model (quick reference)
 
@@ -54,6 +52,4 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 ## Why these specific hooks exist
 
 - **`block-dangerous-git.sh`** — global memory rule: git commit and push require human approval. The hook enforces this even if a session prompt forgets.
-- **`workcheck-reminder.sh`** — prevents committing without a smoke-test trail when working on a ticket.
 - **`session-start-ticket-context.sh`** — auto-resumes ticket context so the user doesn't have to remember to attach related plans/handoffs.
-- **`obsidian-save-reminder.sh`** — nudges the model to externalize knowledge instead of letting it die in chat history.

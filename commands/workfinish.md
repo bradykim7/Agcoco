@@ -106,22 +106,7 @@ feat(WM-XXXXX): 자동완성에서 Google 계정 제외 처리
 - [ ] {test item 2}
 ```
 
-### Step 5 — workcheck 결과 포함 (선택)
-
-`testjob/{TICKET}/results/SMOKE_TEST_REPORT.md`가 존재하면 PR 설명에 테스트 결과 요약을 추가:
-
-```markdown
-## 스모크 테스트 결과
-
-| Endpoint | Method | Status | 비고 |
-|----------|--------|--------|------|
-| auto-complete | GET | 200 | OK |
-| representatives | POST | 201 | Write→Verify ✓ |
-
-> 상세: `testjob/{TICKET}/results/SMOKE_TEST_REPORT.md` 참고
-```
-
-### Step 6 — 최종 출력
+### Step 5 — 최종 출력
 
 ```
 === WM-XXXXX workfinish 완료 ===

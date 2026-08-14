@@ -142,7 +142,7 @@ make build && make test && make lint
 
 다음 단계 추천:
 - [이슈가 있으면] 이슈 수정 후 다시 /validate-plan
-- [모두 통과하면] /workcheck → /workfinish
+- [모두 통과하면] /workfinish
 ```
 
 ---
@@ -175,6 +175,5 @@ make build && make test && make lint
 /iterate-plan 피드백          ← 2. 계획 수정 (반복)
 /implement-plan               ← 3. 계획 구현
 /validate-plan                ← 4. 구현 검증     ← 지금 여기
-/workcheck                    ← 5. 영향 + 스모크
-/workfinish                   ← 6. 커밋 + PR
+/workfinish                   ← 5. 커밋 + PR
 ```

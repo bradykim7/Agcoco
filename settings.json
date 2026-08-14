@@ -12,10 +12,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-dangerous-git.sh"
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/workcheck-reminder.sh"
           }
         ]
       }
@@ -27,17 +23,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/session-start-ticket-context.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/obsidian-save-reminder.sh"
           }
         ]
       }

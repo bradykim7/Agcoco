@@ -26,9 +26,6 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 | Command | Purpose |
 |---------|---------|
 | [`/affected-endpoints`](../commands/affected-endpoints.md) | Trace HTTP endpoints affected by a code change |
-| [`/branch-diff`](../commands/branch-diff.md) | Compare API responses across branches via URL patterns |
-| [`/smoke-test`](../commands/smoke-test.md) | Run curl-based smoke tests (Write→Verify supported) |
-| [`/test-affected`](../commands/test-affected.md) | Affected-endpoints + smoke test in one pass |
 
 ### Commit & PR
 | Command | Purpose |
@@ -37,7 +34,6 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 | [`/commit-mailplug`](../commands/commit-mailplug.md) | Team-convention commit (ticket ID auto-detected) |
 | [`/pr-description`](../commands/pr-description.md) | Generate PR description from diff + commits |
 | [`/workfinish`](../commands/workfinish.md) | Commit-suggest + PR description in one run — "wrap up" |
-| [`/workcheck`](../commands/workcheck.md) | Mid-work check-in — affected-endpoints + smoke test |
 
 ### Session
 | Command | Purpose |

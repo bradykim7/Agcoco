@@ -15,10 +15,17 @@ Keep it tight — it's always in context.
 | `commands/` | Slash command markdown files → symlinked to `~/.claude/commands/` |
 | `skills/` | Skill SKILL.md files → symlinked to `~/.claude/skills/` |
 | `hooks/` | PreToolUse/SessionStart hook scripts → symlinked to `~/.claude/hooks/` |
-| `plugins/` | Claude Code plugin marketplace structure |
+| `plugins/` | Claude Code plugin marketplace structure — **real copies, not symlinks** (see below) |
 | `agents/` | Agent definition files |
 | `tools/` | Install script tool registry |
 | `scripts/` | Standalone shell helpers (e.g., `jira-daily-setup.sh` for launchd) |
+
+**`plugins/` vs `commands/`** — plugin packs are published to a public marketplace, so they carry real copies that must stand alone outside this repo. That means editing `commands/` does NOT update them. Two cases, and they look identical in a diff:
+
+- **Neglect** — the copy is just stale. Fix: `cp commands/<name>.md plugins/<pack>/commands/`.
+- **Deliberate** — `commands/` carries company-only workspace routing (`$MAILWORK_ROOT`, `mailFramework/`, `issue/{TICKET}/`) that must not ship publicly, so the older-looking copy is correct. No `commands/` file is in this state today (`scripts/` and `hooks/` are), so treat it as the rarer case.
+
+Run `bash scripts/check-plugin-sync.sh` to tell them apart — deliberate divergences are registered there with a reason, so anything it flags is genuine neglect. Register new divergences instead of syncing them away.
 
 ## Setup & plugin install
 
@@ -80,11 +87,7 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - `architecture-review` (agent, A) — "review this architecture", "설계 검토", "design risks?"
 
 ### Test
-- `/workcheck` (cmd, A) — "work check", "중간 점검", "지금까지 한 거 점검"
 - `/affected-endpoints` (cmd, A) — "what's affected by this change", "이 변경 어디 영향"
-- `/smoke-test` (cmd, A) — "smoke test", "엔드포인트 테스트"
-- `/test-affected` (cmd, A) — "test what's affected", "영향받은 곳 테스트"
-- `/branch-diff` (cmd, A) — "compare branches", "브랜치 비교"
 
 ### Commit & PR
 - `/commit-suggest` (cmd, A) — "suggest commit message", "커밋 메시지 추천", "커밋 메시지 뭐로 할까"
@@ -111,7 +114,6 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - `git-guardrails-claude-code` (skill, A) — "block dangerous git", "위험한 git 막아줘"
 
 ### Personal & writing
-- `obsidian-vault` (skill, A) — **requires explicit keyword "Obsidian" / "노트" / "옵시디언" / "note"**. Examples: "save this to Obsidian", "옵시디언에 저장해", "노트로 저장", "find a note", "옵시디언에서 찾아줘". Generic "save this" / "이거 저장해" alone does **not** fire this — ask which destination instead.
 - `edit-article` (skill, A) — "edit this article", "글 다듬어줘"
 - `writing-fragments` (skill, A) — "ideate", "fragments", "raw material"
 - `writing-shape` (skill, A) — "shape these notes into article"
@@ -138,7 +140,6 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - **`/handoff` (command) only** — there is no `handoff` skill (deleted as duplicate). Always use `/handoff`, paired with `/resume-handoff`.
 - **`/create-plan` vs `grill-with-docs` + `to-prd` + `to-issues`** — `/create-plan` is one-shot and faster. The skill chain is incremental and produces persistent artifacts (PRDs + issues). Ad-hoc planning → command; formal scoping → skill chain.
 - **`/workfinish` vs piecewise `/commit-suggest` + `/pr-description`** — `/workfinish` runs both. Use it on "wrap up" / "마무리". Use the individual commands when user asks for just one.
-- **`obsidian-vault` skill vs proactive Obsidian saving rule below** — the skill only fires when user explicitly says "Obsidian" / "옵시디언" / "노트" / "note". Generic "save this" / "이거 저장해" is ambiguous (handoff? file? Obsidian?) → ask which destination before acting. The proactive rule below is for moments where I notice something worth capturing without being asked.
 
 ## Per-repo behavior
 
@@ -147,36 +148,17 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 
 ## HTML / frontend design system
 
-For **any HTML/CSS/frontend UI work** (building a page, component, landing page, styling, "make this look good"), read `/Users/mskim/personal/Agcoco/DESIGN.md` first and follow its design system — color tokens, typography ladder, spacing, components, and do's/don'ts. It's the default house style.
+For **any HTML/CSS/frontend UI work** (building a page, component, landing page, styling, "make this look good"), read `~/.claude/DESIGN.md` first and follow its design system — color tokens, typography ladder, spacing, components, and do's/don'ts. It's the default house style.
 
 - Use the documented `{token.refs}` (e.g. `{colors.primary}`, `{typography.hero-display}`) — never inline ad-hoc hex/sizes that the spec already defines.
 - This is the default, not a straitjacket: if the user asks for a different look or the project clearly has its own system, follow that instead and say so.
-- If `DESIGN.md` isn't present at that path (different machine), skip silently — don't error.
-
-## Proactive Obsidian saving
-
-Vault: `$OBSIDIAN_VAULT` (default `$HOME/Obsidian`) — set the env var in your shell config to override.
-
-**When to proactively offer to write a note** (don't wait to be asked):
-- Learned a new tool, CLI feature, or platform capability (e.g., Claude Code plugin system)
-- Made or discovered an architecture/design decision
-- Found a non-obvious pattern, gotcha, or workaround
-- Solved a tricky problem with a generalizable lesson
-
-**Which folder:**
-- General tech knowledge → `30-Development/`
-- Company/team-specific → `20-Company/`
-- Unsure → `00-Inbox/`
-
-**Format:** kebab-case filename, frontmatter with `type`, `date`, `tags`. See `obsidian-vault` skill for full conventions.
-
-**Don't write** for: trivial tasks, one-off fixes, things already in the codebase.
+- If `~/.claude/DESIGN.md` isn't present (install.sh not run), skip silently — don't error.
 
 ## Anti-patterns to avoid
 
 - Don't spawn agents for trivial work (single file read, simple grep) — call the tool directly.
 - Don't invoke a skill the user didn't trigger. Skills fire on user phrasing, not your interpretation.
-- Don't paraphrase command flows; if `/workcheck` exists for a flow, suggest the command, don't reimplement it manually.
+- Don't paraphrase command flows; if `/workfinish` exists for a flow, suggest the command, don't reimplement it manually.
 
 ## Behavioral guidelines
 

@@ -13,7 +13,7 @@
     {
       "name": "workflow",
       "source": "./plugins/workflow",
-      "description": "핵심 작업 커맨드 — workcheck, workfinish, debug, research, handoff, resume-handoff"
+      "description": "핵심 작업 커맨드 — workfinish, debug, research, ask-codex, handoff, resume-handoff"
     },
     {
       "name": "planning",
@@ -23,7 +23,7 @@
     {
       "name": "testing",
       "source": "./plugins/testing",
-      "description": "테스트 & 비교 — affected-endpoints, branch-diff, smoke-test, test-affected"
+      "description": "영향 엔드포인트 추적 — affected-endpoints"
     },
     {
       "name": "git-tools",

@@ -1,6 +1,6 @@
 ---
 description: 오늘 나에게 할당된 Jira 이슈 자동 분석 — macOS 알림 + 계획서 생성
-allowed-tools: Read, Write, Glob, Grep, Bash(terminal-notifier:*), Bash(osascript:*), Bash(ls:*), Bash(date:*), Bash(mkdir:*), Bash(pwd:*), Bash(echo:*), mcp__mailplug-mcp-atlassian__jira_search, mcp__mailplug-mcp-atlassian__jira_get_issue, Agent
+allowed-tools: Read, Write, Glob, Grep, Bash(terminal-notifier:*), Bash(osascript:*), Bash(ls:*), Bash(date:*), Bash(mkdir:*), Bash(pwd:*), Bash(echo:*), mcp__jira-auth-proxy__jira_search, mcp__jira-auth-proxy__jira_get_issue, Agent
 argument-hint: [선택: 특정 이슈 키 또는 추가 JQL 조건]
 ---
 
@@ -16,7 +16,8 @@ argument-hint: [선택: 특정 이슈 키 또는 추가 JQL 조건]
 ## 사전 준비
 
 - macOS + `terminal-notifier` (`brew install terminal-notifier`) — 알림 클릭 액션용
-- Jira MCP 서버 (`mcp__mailplug-mcp-atlassian__*`) 설정됨
+- Jira MCP 서버 (`mcp__jira-auth-proxy__*`) 설정됨
+  - 접두사는 로컬에 등록한 MCP 서버 **이름**을 따라갑니다. `claude mcp list`로 확인하고, 다르면 이 파일의 `mcp__` 참조를 그 이름으로 바꾸세요.
 - 계획서 저장 폴더 (기본 `$PWD/.plans/`, 또는 `JIRA_DAILY_PLANS_DIR` 환경변수로 오버라이드)
 
 ---
@@ -48,7 +49,7 @@ echo "PLANS_DIR=$PLANS_DIR"
 
 기본 JQL: `assignee = currentUser() AND created >= -1d ORDER BY created DESC`
 
-`mcp__mailplug-mcp-atlassian__jira_search` 호출 (limit=20).
+`mcp__jira-auth-proxy__jira_search` 호출 (limit=20).
 
 > **참고**: `assigned >= -1d`는 일부 Jira 인스턴스에서 미지원. `created >= -1d`를 프록시로 사용 (대부분 생성 ≈ 할당).
 
@@ -85,7 +86,7 @@ terminal-notifier -title "🎫 Jira Daily" -subtitle "신규 N건 처리" -messa
 ## Step 5: 각 이슈 처리 (반복)
 
 ### 5a. 상세 정보 가져오기
-`mcp__mailplug-mcp-atlassian__jira_get_issue`로 description + 댓글 포함 전체 정보.
+`mcp__jira-auth-proxy__jira_get_issue`로 description + 댓글 포함 전체 정보.
 
 ### 5b. 코드베이스 리서치 (Agent)
 `codebase-locator` 에이전트 호출:
@@ -200,7 +201,7 @@ terminal-notifier -title "🎫 Jira Daily 완료" -subtitle "신규 {N}건 처�
 ```bash
 bash <(curl -fsSL ...)/scripts/jira-daily-setup.sh
 # 또는 Agcoco 레포에서:
-~/personal/Agcoco/scripts/jira-daily-setup.sh
+"$(dirname "$(readlink ~/.claude/CLAUDE.md)")/scripts/jira-daily-setup.sh"
 ```
 대화형으로 작업 디렉토리/스케줄 시간 입력받아 launchd 등록.
 
