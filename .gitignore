@@ -11,5 +11,16 @@ __pycache__/
 .plans/
 .research/
 
-# Codex-managed system skills — auto-synced by Codex CLI, not hand-authored
-skills/.system/
+# skills/ 는 카테고리 디렉토리만 추적한다.
+# - install.sh 가 skills/<name> -> <category>/<name> 평탄화 심링크를 생성하는데
+#   (Claude/Codex 가 한 단계만 탐색하므로 필요) 재생성 가능한 빌드 산출물이다.
+# - skills/.system/ 은 Codex CLI 가 자동 동기화하며 직접 작성하지 않는다.
+# 새 카테고리를 만들면 아래에 negation 을 한 줄 추가해야 추적된다.
+skills/*
+!skills/engineering/
+!skills/in-progress/
+!skills/misc/
+!skills/personal/
+!skills/productivity/
+!skills/README.md
+!skills/LICENSE.mattpocock
