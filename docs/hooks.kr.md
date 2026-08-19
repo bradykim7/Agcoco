@@ -15,7 +15,7 @@
 | 스크립트 | 이벤트 | 유형 | 용도 |
 |----------|--------|------|------|
 | [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **블로킹** | `git commit`, `git push`, `git filter-repo`, `git reset --hard` 등 거부 — 사람 승인 필요 |
-| [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | 컨텍스트 주입 | 브랜치가 JIRA 티켓 패턴이면 `.plans/`, `.handoffs/`, `.research/`, `testjob/<ticket>/` 자료 자동 노출 |
+| [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | 컨텍스트 주입 | 브랜치가 JIRA 티켓 패턴이면 해당 티켓 문서 자동 노출. 공용 티켓 문서 루트를 우선 사용하고(`$TICKET_DOCS_ROOT` 로 지정, 미지정 시 상위 디렉터리에서 `issue/` 탐색), 없으면 `.plans/`, `.handoffs/`, `.research/` 에서 티켓명이 들어간 파일을 찾는다 |
 
 ## Hook 이벤트 모델 (요약)
 

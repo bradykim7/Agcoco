@@ -15,7 +15,7 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 | Script | Event | Type | Purpose |
 |--------|-------|------|---------|
 | [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **Blocking** | Refuses `git commit`, `git push`, `git filter-repo`, `git reset --hard`, etc. — human approval required |
-| [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | Annotates context | When branch matches a Jira-style ticket pattern, surfaces related `.plans/`, `.handoffs/`, `.research/`, `testjob/<ticket>/` artifacts |
+| [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | Annotates context | When the branch matches a Jira-style ticket pattern, surfaces that ticket's docs. Prefers a shared ticket-docs root — set `$TICKET_DOCS_ROOT`, or let it find a sibling `issue/` by walking up — and otherwise falls back to matching files in `.plans/`, `.handoffs/`, `.research/` |
 
 ## Hook event model (quick reference)
 
@@ -52,4 +52,4 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 ## Why these specific hooks exist
 
 - **`block-dangerous-git.sh`** — global memory rule: git commit and push require human approval. The hook enforces this even if a session prompt forgets.
-- **`session-start-ticket-context.sh`** — auto-resumes ticket context so the user doesn't have to remember to attach related plans/handoffs.
+- **`session-start-ticket-context.sh`** — auto-resumes ticket context so the user doesn't have to remember to attach the ticket's docs. Works whether those docs live in the repo or in a shared per-ticket directory outside it.

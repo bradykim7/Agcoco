@@ -106,10 +106,9 @@ $DIR_TREE
 - TODO: 프로젝트 특이사항 추가
 CLAUDEEOF
 
-        # .handoffs, .plans, .research 디렉토리 생성
-        mkdir -p "$TARGET_DIR/.handoffs" "$TARGET_DIR/.plans" "$TARGET_DIR/.research"
-
-        # .gitignore에 추가 (이미 없으면)
+        # 디렉토리는 미리 만들지 않는다 — .handoffs/.plans/.research 는
+        # /handoff·/research·/create-plan 이 실제로 쓸 때 생성된다.
+        # 커밋 사고만 막도록 .gitignore 패턴은 미리 등록한다.
         GITIGNORE="$TARGET_DIR/.gitignore"
         if [ -f "$GITIGNORE" ]; then
             for PATTERN in ".handoffs/" ".plans/" ".research/"; do
@@ -120,7 +119,6 @@ CLAUDEEOF
         fi
 
         echo "[✓] CLAUDE.md 생성 완료: $CLAUDE_MD"
-        echo "[✓] 작업 디렉토리 생성: .handoffs/ .plans/ .research/"
         echo ""
         echo "다음 단계:"
         echo "  1. CLAUDE.md의 TODO 항목을 프로젝트에 맞게 수정"
@@ -137,7 +135,7 @@ CLAUDEEOF
         echo ""
         echo "Commands:"
         echo "  install                 글로벌 설치 (기본값) — ~/.claude/ + (감지 시) ~/.codex/ symlink 생성"
-        echo "  init [path]             프로젝트 초기화 — CLAUDE.md + 작업 디렉토리 생성"
+        echo "  init [path]             프로젝트 초기화 — CLAUDE.md 생성 + .gitignore 패턴 등록"
         echo "  help                    이 도움말 표시"
         echo ""
         echo "멀티툴 지원:"

@@ -141,7 +141,7 @@ cd ~/agcoco
 ./install.sh init ~/my-project
 ```
 
-프로젝트에 `CLAUDE.md` + 작업 디렉토리(`.handoffs/`, `.plans/`, `.research/`)가 생성됩니다.
+프로젝트에 `CLAUDE.md` 가 생성되고, `.gitignore` 에 작업 디렉토리(`.handoffs/`, `.plans/`, `.research/`) 패턴이 등록됩니다.
 `CLAUDE.md`의 TODO 항목을 프로젝트에 맞게 편집하세요.
 
 ---

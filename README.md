@@ -117,7 +117,7 @@ Non-LLM scripts that run on tool invocation or session events. The agent doesn't
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `block-dangerous-git.sh` | PreToolUse: Bash | Block `git commit/push/filter-repo/reset --hard` — require human approval |
-| `session-start-ticket-context.sh` | SessionStart | Auto-load `.plans/`, `.handoffs/`, `.research/` for JIRA ticket branches |
+| `session-start-ticket-context.sh` | SessionStart | On a Jira-style ticket branch, surface that ticket's docs — from a shared ticket-docs root (`$TICKET_DOCS_ROOT`) if there is one, else from `.plans/`, `.handoffs/`, `.research/` |
 
 <img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
 
@@ -158,7 +158,7 @@ Plain Markdown on disk is the memory. Plans, research notes, and handoffs all li
 ./install.sh init /path/to/project
 ```
 
-Creates `CLAUDE.md` + `.handoffs/` + `.plans/` + `.research/` in the target project.
+Creates `CLAUDE.md` in the target project, and registers `.handoffs/`, `.plans/`, `.research/` in its `.gitignore`. The directories themselves are made on demand by `/handoff`, `/research`, and `/create-plan`.
 
 ## Output
 

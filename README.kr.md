@@ -117,7 +117,7 @@ cd ~/agcoco
 | Hook | 이벤트 | 용도 |
 |------|--------|------|
 | `block-dangerous-git.sh` | PreToolUse: Bash | `git commit/push/filter-repo/reset --hard` 차단 — 사람 승인 필요 |
-| `session-start-ticket-context.sh` | SessionStart | JIRA 티켓 브랜치에서 `.plans/`, `.handoffs/`, `.research/` 자동 로드 |
+| `session-start-ticket-context.sh` | SessionStart | JIRA 티켓 브랜치에서 해당 티켓 문서 자동 로드 — 공용 티켓 문서 루트(`$TICKET_DOCS_ROOT`)가 있으면 거기서, 없으면 `.plans/`, `.handoffs/`, `.research/` 에서 |
 
 <img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
 
@@ -158,7 +158,7 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 ./install.sh init /path/to/project
 ```
 
-대상 프로젝트에 `CLAUDE.md` + `.handoffs/` + `.plans/` + `.research/` 생성.
+대상 프로젝트에 `CLAUDE.md` 생성 + `.gitignore` 에 `.handoffs/`, `.plans/`, `.research/` 등록. 디렉터리 자체는 `/handoff`·`/research`·`/create-plan` 이 쓸 때 만들어집니다.
 
 ## 출력
 

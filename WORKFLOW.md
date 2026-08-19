@@ -234,7 +234,7 @@ Claude (Opus):
 ### 새 프로젝트에서 시작하기
 
 ```
-1. ./install.sh init /path/to/project        ← CLAUDE.md + .handoffs/ + .plans/ 생성
+1. ./install.sh init /path/to/project        ← CLAUDE.md 생성 + .gitignore 패턴 등록
 2. cd /path/to/project
 3. (Claude 세션에서) "set up the engineering skills"  ← setup-matt-pocock-skills 자동 호출
 4. AGENTS.md 또는 CLAUDE.md에 issue tracker, triage labels, 도메인 문서 경로 자동 기록됨
