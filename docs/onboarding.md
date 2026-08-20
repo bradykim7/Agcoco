@@ -163,6 +163,7 @@ cd ~/agcoco
 |--------|----------|
 | `/research` | 코드베이스를 파악하고 문서로 남기고 싶을 때 |
 | `/debug` | 에러가 발생해서 원인을 찾아야 할 때 |
+| `/ask-codex` | 판단이 갈리는 문제를 Codex와 블라인드 교차 검증할 때 (Codex CLI 필요) |
 
 ### 세션 관리
 
@@ -185,6 +186,14 @@ cd ~/agcoco
 | `/commit-mailplug` | 팀 컨벤션에 맞는 커밋 메시지 추천 |
 | `/commit-suggest` | 일반 커밋 메시지 추천 |
 | `/pr-description` | PR 설명 자동 생성 |
+
+### Jira 자동화
+
+| 커맨드 | 언제 쓰나 |
+|--------|----------|
+| `/jira-daily` | 오늘 나에게 할당된 이슈를 받아 정리할 때 (Jira MCP 필요, 팀 환경 전용) |
+
+`scripts/jira-daily-setup.sh` 로 macOS LaunchAgent 에 등록하면 하루 2회 자동 실행됩니다.
 
 ### Claude Code 사용 통계
 

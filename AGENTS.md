@@ -23,7 +23,7 @@ Keep it tight — it's always in context.
 **`plugins/` vs `commands/`** — plugin packs are published to a public marketplace, so they carry real copies that must stand alone outside this repo. That means editing `commands/` does NOT update them. Two cases, and they look identical in a diff:
 
 - **Neglect** — the copy is just stale. Fix: `cp commands/<name>.md plugins/<pack>/commands/`.
-- **Deliberate** — `commands/` carries company-only workspace routing (`$MAILWORK_ROOT`, `mailFramework/`, `issue/{TICKET}/`) that must not ship publicly, so the older-looking copy is correct. No `commands/` file is in this state today (`scripts/` and `hooks/` are), so treat it as the rarer case.
+- **Deliberate** — `commands/` carries company-only workspace routing (`$MAILWORK_ROOT`, `mailFramework/`) that must not ship publicly, so the older-looking copy is correct. No `commands/` file is in this state today (`scripts/jira-daily-setup.sh` is), so treat it as the rarer case.
 
 Run `bash scripts/check-plugin-sync.sh` to tell them apart — deliberate divergences are registered there with a reason, so anything it flags is genuine neglect. Register new divergences instead of syncing them away.
 

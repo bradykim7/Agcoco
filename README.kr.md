@@ -9,7 +9,27 @@
 
 ## 아키텍처
 
-![agcoco architecture](./architecture.png)
+```
+  agcoco 레포 — 하나의 원본
+  ├── AGENTS.md — 에이전트 공용 메모리
+  └── commands/ · agents/ · skills/ · hooks/ · settings.json
+         │
+         ▼
+  ./install.sh — tools/*.sh 순회, 설치된 CLI 자동 감지
+         │
+  ┌──────┴──────┐
+  ▼             ▼
+  ~/.claude/    ~/.codex/     (심링크)
+  └──────┬──────┘
+         ▼
+  ┌───▶ 에이전트 세션
+  │      │  기록
+  │      ▼
+  │   .plans/ · .research/ · .handoffs/
+  │   커밋 메시지 · PR 설명
+  │      │
+  └──────┘   다음 세션이 시작할 때 다시 읽음
+```
 
 ## 빠른 시작
 
@@ -27,9 +47,29 @@ cd ~/agcoco
 - **Skills** — 사용자 문구가 `description` 필드와 매치되면 자동 발화. 슬래시 불필요.
 - **Agents** — Claude 가 커맨드 안에서 자동 spawn. 전문화된 단일 작업.
 
-<img src="./docs/images/agcoco-02-router.png" alt="Three ways to fire the loop" width="720">
+```
+  사용자 메시지
+      │
+      ▼
+  라우팅 — 이미 로드된 설정에 비춰 에이전트가 직접 판단
+      │
+      ├─▶ commands/*.md      명시: /research 를 직접 입력
+      │                      완전히 스크립트된 워크플로우
+      │
+      ├─▶ skills/*/SKILL.md  암묵: 문구가 description 과 매치
+      │                      슬래시 없이 자동 로드
+      │
+      ▼
+  코어 루프 — 읽기 · 계획 · 위임 · 관찰 · 기록
+      │
+      ├─▶ agents/*.md        1..N 개 병렬 spawn
+      │                      grep · 분석 · 웹 검색 · 문서 요약
+      │◀─                    구조화된 결과를 다시 병합
+      ▼
+  하나로 합쳐진 답변 + 디스크에 기록된 파일
+```
 
-<img src="./docs/images/agcoco-04-core.png" alt="The core agent loop" width="720">
+계획과 병합은 supervisor 하나가 맡고, 거기서 spawn 되는 서브 에이전트는 더 싼 모델에서 돕니다 — 12개 중 8개가 Sonnet, 3개가 Haiku, 1개가 Opus.
 
 ## 포함 내용
 
@@ -38,14 +78,12 @@ cd ~/agcoco
 | 카테고리 | 커맨드 |
 |----------|--------|
 | **계획 라이프사이클** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
-| **리서치 & 디버그** | `/research`, `/debug` |
+| **리서치 & 디버그** | `/research`, `/debug`, `/ask-codex` |
 | **세션** | `/handoff`, `/resume-handoff` |
 | **테스트** | `/affected-endpoints` |
 | **커밋 & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude 사용량** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
 | **Jira 자동화** | `/jira-daily` (+ 선택적 `scripts/jira-daily-setup.sh` launchd cron) |
-
-<img src="./docs/images/agcoco-05-commands.png" alt="18 workflows behind a slash" width="720">
 
 ### Agents (12개)
 
@@ -65,8 +103,6 @@ cd ~/agcoco
 | `consistency-check` | 데이터 스냅샷 비교 |
 | `document-summarizer` | 문서 요약 |
 | `pr-description-generator` | PR 설명 생성 |
-
-<img src="./docs/images/agcoco-06-agents.png" alt="12 specialists on Sonnet" width="720">
 
 ### Skills (21개)
 
@@ -96,8 +132,6 @@ cd ~/agcoco
 | | `writing-shape` | "shape these notes into an article" |
 | | `writing-beats` | "assemble this as a narrative" |
 
-<img src="./docs/images/agcoco-07-skills.png" alt="21 habits, autoloaded" width="720">
-
 ### Plugins (6개)
 
 커맨드와 스킬은 `plugins/` 내 설치 가능한 플러그인 팩으로도 제공. 원하는 팩만 선택 가능 — 전체 config 채택 불필요.
@@ -108,8 +142,6 @@ cd ~/agcoco
 /plugin install workflow@agcoco
 ```
 
-<img src="./docs/images/agcoco-08-plugins.png" alt="6 marketplace bundles" width="720">
-
 ### Hooks (2개)
 
 도구 호출 또는 세션 이벤트에서 실행되는 비-LLM 스크립트. 에이전트가 무시할 수 없음 — 런타임이 강제.
@@ -119,13 +151,9 @@ cd ~/agcoco
 | `block-dangerous-git.sh` | PreToolUse: Bash | `git commit/push/filter-repo/reset --hard` 차단 — 사람 승인 필요 |
 | `session-start-ticket-context.sh` | SessionStart | JIRA 티켓 브랜치에서 해당 티켓 문서 자동 로드 — 공용 티켓 문서 루트(`$TICKET_DOCS_ROOT`)가 있으면 거기서, 없으면 `.plans/`, `.handoffs/`, `.research/` 에서 |
 
-<img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
-
 ## 멀티 툴 지원 (`tools/` 레지스트리)
 
 도구 종속이 없는 — `install.sh` 가 `tools/*.sh` 를 일반 루프로 순회하며 설치된 CLI 자동 감지 후 선언된 심링크 생성. `AGENTS.md` 가 **표준 (canonical)** 에이전트 컨텍스트 (openclaw 패턴); 각 도구의 메모리 파일명은 이 파일을 가리키는 심링크.
-
-<img src="./docs/images/agcoco-01-input.png" alt="One config, many CLIs" width="720">
 
 **기본 제공 (검증됨):**
 
@@ -133,8 +161,8 @@ cd ~/agcoco
 |------|------|------|-------------|
 | `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `commands`, `agents`, `skills`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (동일 SKILL.md 포맷) |
-
-<img src="./docs/images/agcoco-03-integration.png" alt="One source, symlinked everywhere" width="720">
+| `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | 없음 — 어댑터의 `TOOL_SETUP` 훅으로 부트스트랩 |
+| `tools/ponytail.sh` | Ponytail 플러그인 | `command -v claude` | 없음 — `TOOL_SETUP` 이 플러그인 마켓플레이스로 설치 |
 
 **다른 도구 추가** — Gemini, Cursor agent, Aider, Continue 등:
 
@@ -150,7 +178,17 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 
 디스크 위의 플레인 마크다운이 메모리. 계획서, 리서치 노트, 핸드오프가 파일로 존재해 다음 세션, 다음 브랜치, 다른 머신에서도 에이전트가 읽을 수 있음 — 컨텍스트가 채팅 윈도우를 넘어 생존.
 
-<img src="./docs/images/agcoco-09-memory.png" alt="Markdown on disk is the memory" width="720">
+```
+  세션 1 — /research → /create-plan → /handoff
+      │
+      ▼ 기록
+  .research/*.md · .plans/*.md · .handoffs/*.md
+      │
+      ▼ /resume-handoff · SessionStart 훅
+  세션 2 — 새 대화 · 새 브랜치 · 다른 머신
+      │
+      └─▶ 같은 파일에 이어서 기록 (맨 위로 순환)
+```
 
 ### 프로젝트 초기화
 
@@ -163,8 +201,6 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 ## 출력
 
 모든 워크플로우는 채팅 답변이 아닌 구체적인 파일 또는 메시지를 생성. 커밋 메시지는 팀 컨벤션을 따르고, PR 설명은 자동 생성되며, 테스트 리포트는 다음 세션이 읽을 수 있도록 체크인.
-
-<img src="./docs/images/agcoco-10-output.png" alt="What lands in your repo" width="720">
 
 ## 문서
 

@@ -21,6 +21,7 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 |---------|---------|
 | [`/research`](../commands/research.md) | Parallel codebase exploration → research doc |
 | [`/debug`](../commands/debug.md) | Broad parallel investigation (logs + git + files) when cause is unknown |
+| [`/ask-codex`](../commands/ask-codex.md) | Blind cross-check — Claude and Codex answer independently, then rebut each other; this session's Claude judges rather than participates |
 
 ### Test
 | Command | Purpose |

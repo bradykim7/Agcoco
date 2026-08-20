@@ -21,6 +21,7 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 |--------|------|
 | [`/research`](../commands/research.md) | 병렬 에이전트로 코드베이스 조사 → 리서치 문서 생성 |
 | [`/debug`](../commands/debug.md) | 원인 모를 때 로그/git/파일 병렬 조사 |
+| [`/ask-codex`](../commands/ask-codex.md) | 블라인드 교차 검증 — Claude와 Codex가 서로 답을 모르는 상태로 각자 답한 뒤 교차 반론, 이 세션의 Claude는 심판 역할 |
 
 ### 테스트
 | 커맨드 | 용도 |

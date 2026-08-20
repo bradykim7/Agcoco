@@ -9,7 +9,27 @@ Manages custom slash commands, sub-agents, skills, and per-tool symlinks for any
 
 ## Architecture
 
-![agcoco architecture](./architecture.png)
+```
+  agcoco repo — one source of truth
+  ├── AGENTS.md — canonical agent memory
+  └── commands/ · agents/ · skills/ · hooks/ · settings.json
+         │
+         ▼
+  ./install.sh — loops over tools/*.sh, auto-detects installed CLIs
+         │
+  ┌──────┴──────┐
+  ▼             ▼
+  ~/.claude/    ~/.codex/     (symlinks)
+  └──────┬──────┘
+         ▼
+  ┌───▶ agent session
+  │      │  writes
+  │      ▼
+  │   .plans/ · .research/ · .handoffs/
+  │   commit messages · PR descriptions
+  │      │
+  └──────┘   read back at the start of the next session
+```
 
 ## Quick Start
 
@@ -27,9 +47,29 @@ Three ways to fire a workflow — a slash command you type, a skill that auto-fi
 - **Skills** — auto-fire when your phrasing matches the `description` field. No slash needed.
 - **Agents** — Claude spawns them automatically inside a command. Specialized single tasks.
 
-<img src="./docs/images/agcoco-02-router.png" alt="Three ways to fire the loop" width="720">
+```
+  your message
+      │
+      ▼
+  routing — the agent reads it against the config it already loaded
+      │
+      ├─▶ commands/*.md      explicit: you typed /research
+      │                      a fully scripted workflow
+      │
+      ├─▶ skills/*/SKILL.md  implicit: your phrasing matched a description
+      │                      auto-loaded, no slash needed
+      │
+      ▼
+  core loop — read · plan · delegate · observe · write
+      │
+      ├─▶ agents/*.md        1..N spawned in parallel
+      │                      grep · analysis · web search · doc summary
+      │◀─                    structured returns, folded back
+      ▼
+  one coherent answer + files written to disk
+```
 
-<img src="./docs/images/agcoco-04-core.png" alt="The core agent loop" width="720">
+One supervisor plans and merges; the sub-agents it spawns run on cheaper models — 8 of the 12 on Sonnet, 3 on Haiku, 1 on Opus.
 
 ## What's Included
 
@@ -38,14 +78,12 @@ Three ways to fire a workflow — a slash command you type, a skill that auto-fi
 | Category | Commands |
 |----------|----------|
 | **Plan Lifecycle** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
-| **Research & Debug** | `/research`, `/debug` |
+| **Research & Debug** | `/research`, `/debug`, `/ask-codex` |
 | **Session** | `/handoff`, `/resume-handoff` |
 | **Test** | `/affected-endpoints` |
 | **Commit & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude Usage** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
 | **Jira Automation** | `/jira-daily` (+ optional `scripts/jira-daily-setup.sh` for launchd cron) |
-
-<img src="./docs/images/agcoco-05-commands.png" alt="18 workflows behind a slash" width="720">
 
 ### Agents (12)
 
@@ -65,8 +103,6 @@ Commands trigger these automatically — you don't call them directly.
 | `consistency-check` | Data snapshot comparison |
 | `document-summarizer` | Document summarization |
 | `pr-description-generator` | PR description generation |
-
-<img src="./docs/images/agcoco-06-agents.png" alt="12 specialists on Sonnet" width="720">
 
 ### Skills (21)
 
@@ -96,8 +132,6 @@ Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). Ski
 | | `writing-shape` | "shape these notes into an article" |
 | | `writing-beats` | "assemble this as a narrative" |
 
-<img src="./docs/images/agcoco-07-skills.png" alt="21 habits, autoloaded" width="720">
-
 ### Plugins (6)
 
 Commands and skills also ship as installable plugin packs in `plugins/`. Cherry-pick a pack — you don't have to adopt the whole config.
@@ -108,8 +142,6 @@ Commands and skills also ship as installable plugin packs in `plugins/`. Cherry-
 /plugin install workflow@agcoco
 ```
 
-<img src="./docs/images/agcoco-08-plugins.png" alt="6 marketplace bundles" width="720">
-
 ### Hooks (2)
 
 Non-LLM scripts that run on tool invocation or session events. The agent doesn't choose to honour them — the runtime enforces them.
@@ -119,13 +151,9 @@ Non-LLM scripts that run on tool invocation or session events. The agent doesn't
 | `block-dangerous-git.sh` | PreToolUse: Bash | Block `git commit/push/filter-repo/reset --hard` — require human approval |
 | `session-start-ticket-context.sh` | SessionStart | On a Jira-style ticket branch, surface that ticket's docs — from a shared ticket-docs root (`$TICKET_DOCS_ROOT`) if there is one, else from `.plans/`, `.handoffs/`, `.research/` |
 
-<img src="./docs/images/agcoco-11-hooks.png" alt="2 guardrails the agent can't dodge" width="720">
-
 ## Multi-Tool Support (`tools/` registry)
 
 Tool-agnostic — `install.sh` runs a generic loop over `tools/*.sh`, auto-detects whatever CLIs are installed, and creates the declared symlinks. `AGENTS.md` is the **canonical** agent context (openclaw pattern); each tool's expected memory filename is a symlink to it.
-
-<img src="./docs/images/agcoco-01-input.png" alt="One config, many CLIs" width="720">
 
 **Shipped (verified):**
 
@@ -133,8 +161,8 @@ Tool-agnostic — `install.sh` runs a generic loop over `tools/*.sh`, auto-detec
 |---|---|---|---|
 | `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `commands`, `agents`, `skills`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (same SKILL.md format) |
-
-<img src="./docs/images/agcoco-03-integration.png" alt="One source, symlinked everywhere" width="720">
+| `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | none — bootstrapped through the adapter's `TOOL_SETUP` hook |
+| `tools/ponytail.sh` | Ponytail plugin | `command -v claude` | none — installed from the plugin marketplace by `TOOL_SETUP` |
 
 **Add any other tool** — Gemini, Cursor agent, Aider, Continue, etc:
 
@@ -150,7 +178,17 @@ $EDITOR tools/<your-tool>.sh    # fill in 4 vars: TOOL_NAME, TOOL_CMD, TOOL_DIR,
 
 Plain Markdown on disk is the memory. Plans, research notes, and handoffs all live as files the agent can read on the next session, on the next branch, or from a different machine — context survives the chat window.
 
-<img src="./docs/images/agcoco-09-memory.png" alt="Markdown on disk is the memory" width="720">
+```
+  session 1 — /research → /create-plan → /handoff
+      │
+      ▼ writes
+  .research/*.md · .plans/*.md · .handoffs/*.md
+      │
+      ▼ /resume-handoff · SessionStart hook
+  session 2 — new chat · new branch · another machine
+      │
+      └─▶ appends to the same files (loops back to the top)
+```
 
 ### Project Init
 
@@ -163,8 +201,6 @@ Creates `CLAUDE.md` in the target project, and registers `.handoffs/`, `.plans/`
 ## Output
 
 Every workflow produces a concrete file or message — not just a chat reply. Commit messages follow team convention, PR descriptions write themselves, test reports get checked in for the next session to read.
-
-<img src="./docs/images/agcoco-10-output.png" alt="What lands in your repo" width="720">
 
 ## Docs
 

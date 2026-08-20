@@ -48,4 +48,6 @@ Skipped by the install loop. Useful for templates and disabled tools.
 |---|---|---|
 | `claude.sh` | Verified | Primary; `install.sh` also auto-installs Claude Code via npm if missing |
 | `codex.sh` | Verified | Shares `AGENTS.md` + `skills/` with Claude |
+| `codegraph.sh` | Verified | Not a peer CLI — bootstraps the CodeGraph MCP server via `TOOL_SETUP`; creates no symlinks |
+| `ponytail.sh` | Verified | Not a peer CLI — installs the Ponytail Claude Code plugin via `TOOL_SETUP`; creates no symlinks |
 | `_template.sh` | Inert | Template + speculative examples |
