@@ -34,7 +34,7 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 | [`/commit-suggest`](../commands/commit-suggest.md) | 스테이징된 파일 + 히스토리로 커밋 메시지 추천 |
 | [`/commit-mailplug`](../commands/commit-mailplug.md) | 팀 컨벤션 커밋 메시지 (티켓 ID 자동 감지) |
 | [`/pr-description`](../commands/pr-description.md) | git diff 기반 PR 설명 자동 생성 |
-| [`/workfinish`](../commands/workfinish.md) | 커밋 + PR 설명 한번에 — "마무리하자" |
+| [`/workfinish`](../commands/workfinish.md) | 커밋 메시지 추천 + PR 설명 한번에 — "마무리하자" |
 
 ### 세션
 | 커맨드 | 용도 |
@@ -53,6 +53,9 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 | 커맨드 | 용도 |
 |--------|------|
 | [`/jira-daily`](../commands/jira-daily.md) | 오늘 할당된 Jira 이슈 분석 — macOS 알림 + 계획서 생성 |
+
+
+`/workfinish`는 메시지 추천과 PR 설명 초안을 생성하며, 커밋·푸시는 항상 사용자가 직접 실행합니다. `/pr-description`, `/affected-endpoints`, `/workfinish`는 `main`·`master`를 지원하고 유효한 `origin/HEAD`를 우선합니다. `claude-usage` 플러그인은 collect/analyze만 제공하며 팀 보고서는 개인 설치용 커맨드입니다.
 
 ## 규칙
 

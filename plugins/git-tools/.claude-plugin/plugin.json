@@ -1,5 +1,5 @@
 {
   "name": "git-tools",
   "description": "커밋 & PR 도구. commit-mailplug(팀 컨벤션 커밋), commit-suggest(일반 커밋), pr-description(PR 설명 자동생성) + git-guardrails(위험 명령 차단), setup-pre-commit 스킬 포함.",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

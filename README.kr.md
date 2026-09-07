@@ -134,10 +134,12 @@ cd ~/agcoco
 
 ### Plugins (6개)
 
+`claude-usage` 팩에는 collect/analyze만 포함합니다. 팀 보고서와 Jira 커맨드는 개인 설치용입니다.
+
 커맨드와 스킬은 `plugins/` 내 설치 가능한 플러그인 팩으로도 제공. 원하는 팩만 선택 가능 — 전체 config 채택 불필요.
 
 ```bash
-/plugin marketplace add mskim/Agcoco
+/plugin marketplace add bradykim7/Agcoco
 /plugin install engineering-skills@agcoco
 /plugin install workflow@agcoco
 ```
@@ -148,8 +150,10 @@ cd ~/agcoco
 
 | Hook | 이벤트 | 용도 |
 |------|--------|------|
-| `block-dangerous-git.sh` | PreToolUse: Bash | `git commit/push/filter-repo/reset --hard` 차단 — 사람 승인 필요 |
+| `block-dangerous-git.sh` | PreToolUse: Bash | `git commit/push/filter-repo/reset --hard` 차단 — 커밋·푸시는 승인 여부와 관계없이 사용자 직접 실행 |
 | `session-start-ticket-context.sh` | SessionStart | JIRA 티켓 브랜치에서 해당 티켓 문서 자동 로드 — 공용 티켓 문서 루트(`$TICKET_DOCS_ROOT`)가 있으면 거기서, 없으면 `.plans/`, `.handoffs/`, `.research/` 에서 |
+
+Git 차단기는 Bash, jq, Python 3, [shfmt 3](https://github.com/mvdan/sh#shfmt)가 필요합니다(macOS: `brew install shfmt`). 입력을 실행하지 않고 셸 구문을 분석하며, 수동 복사 시 `git-command-guard.py`를 셸 훅과 같은 디렉터리에 둡니다.
 
 ## 멀티 툴 지원 (`tools/` 레지스트리)
 
@@ -159,7 +163,7 @@ cd ~/agcoco
 
 | 파일 | 도구 | 감지 | 생성 심링크 |
 |------|------|------|-------------|
-| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `commands`, `agents`, `skills`, `settings.json` |
+| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (동일 SKILL.md 포맷) |
 | `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | 없음 — 어댑터의 `TOOL_SETUP` 훅으로 부트스트랩 |
 | `tools/ponytail.sh` | Ponytail 플러그인 | `command -v claude` | 없음 — `TOOL_SETUP` 이 플러그인 마켓플레이스로 설치 |
@@ -196,11 +200,23 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 ./install.sh init /path/to/project
 ```
 
-대상 프로젝트에 `CLAUDE.md` 생성 + `.gitignore` 에 `.handoffs/`, `.plans/`, `.research/` 등록. 디렉터리 자체는 `/handoff`·`/research`·`/create-plan` 이 쓸 때 만들어집니다.
+대상 프로젝트에 `CLAUDE.md`를 만들고, `.gitignore`가 이미 있을 때만 `.handoffs/`, `.plans/`, `.research/` 패턴을 추가합니다. `.gitignore`가 없으면 직접 만들고, 주석에만 패턴이 있어 중복으로 판단되는 경우도 실제 제외 여부를 확인하세요. 디렉터리 자체는 `/handoff`·`/research`·`/create-plan` 이 쓸 때 만들어집니다.
+
+## 검증
+
+저장소 루트에서 실행합니다(Python 3.10+, Bash, Git, jq, shfmt 3 필요).
+
+```bash
+python3 -B scripts/check-agent-regressions.py
+python3 -B scripts/check-shell-regressions.py
+bash scripts/check-plugin-sync.sh
+```
+
+API 호출이나 launchd 등록은 하지 않습니다. 검사 범위는 [Scripts](docs/scripts.kr.md)를 참고하세요.
 
 ## 출력
 
-모든 워크플로우는 채팅 답변이 아닌 구체적인 파일 또는 메시지를 생성. 커밋 메시지는 팀 컨벤션을 따르고, PR 설명은 자동 생성되며, 테스트 리포트는 다음 세션이 읽을 수 있도록 체크인.
+모든 워크플로우는 채팅 답변이 아닌 구체적인 파일 또는 메시지를 생성. 커밋 메시지는 팀 컨벤션을 따르고, PR 설명은 자동 생성되며, 리포트는 다음 세션이 읽을 수 있도록 로컬 파일로 남습니다. 커밋·푸시는 항상 사용자가 직접 실행합니다.
 
 ## 문서
 
@@ -208,7 +224,7 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 - [슬래시 커맨드](docs/commands.kr.md) ([EN](docs/commands.en.md)) — 카테고리별 18개 커맨드
 - [서브 에이전트](docs/agents.kr.md) ([EN](docs/agents.en.md)) — Claude 가 spawn 하는 12개 전문 에이전트
 - [Hooks](docs/hooks.kr.md) ([EN](docs/hooks.en.md)) — 2개 라이프사이클 hook 스크립트
-- [Scripts](docs/scripts.kr.md) ([EN](docs/scripts.en.md)) — 독립 실행 셸 헬퍼
+- [Scripts](docs/scripts.kr.md) ([EN](docs/scripts.en.md)) — 독립 실행 셸·Python 헬퍼
 - [Plugins](docs/plugins.kr.md) ([EN](docs/plugins.en.md)) — 6개 플러그인 마켓플레이스 번들
 
 ### 가이드

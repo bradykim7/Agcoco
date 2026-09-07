@@ -19,6 +19,7 @@ import anthropic
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.global_policy import GLOBAL_AGENT_POLICY
+from shared.schema import validate_schema
 from endpoint_analysis.prompt import ENDPOINT_ANALYSIS_PROMPT, ENDPOINT_ANALYSIS_SCHEMA
 
 # ---------------------------------------------------------------------------
@@ -40,11 +41,6 @@ def parse_json_response(text: str) -> dict:
         lines = text.splitlines()
         text = "\n".join(lines[1:-1]).strip()
     return json.loads(text)
-
-
-def validate_schema(data: dict) -> list[str]:
-    required = ENDPOINT_ANALYSIS_SCHEMA["required"]
-    return [f for f in required if f not in data]
 
 
 def build_context_block(
@@ -96,7 +92,7 @@ def run_endpoint_analysis(
     Args:
         method: HTTP 메서드 (GET, POST, PUT, DELETE 등)
         path: 엔드포인트 경로 (예: /api/v2/mail/auto-complete)
-        code_snippets: {"파일명": "코드 내용"} 형태의 관련 코드
+        code_snippets: {"파일 경로": "코드 내용"} 형태의 관련 코드
         spec_text: OpenAPI/Swagger 등 스펙 문서 텍스트
         focus_points: 특별히 분석에 집중할 항목 목록
 
@@ -140,9 +136,7 @@ Analyze the following endpoint and return structured JSON only.
         print(f"[Raw response]\n{raw_text}")
         raise
 
-    missing = validate_schema(result)
-    if missing:
-        print(f"[Warning] 누락된 필드: {missing}")
+    validate_schema(result, ENDPOINT_ANALYSIS_SCHEMA)
 
     return result
 
@@ -275,7 +269,7 @@ def main():
         code_snippets = {}
         for file_path in args.code or []:
             with open(file_path, "r", encoding="utf-8") as f:
-                code_snippets[os.path.basename(file_path)] = f.read()
+                code_snippets[file_path] = f.read()
 
         # 스펙 파일 읽기
         spec_text = None

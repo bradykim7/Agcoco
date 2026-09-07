@@ -1,6 +1,6 @@
 ---
 description: 작업 마무리 — 커밋 메시지 추천 + PR 설명 생성 한번에 실행
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(cat:*), Bash(ls:*), Read, Glob, Grep
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git symbolic-ref:*), Bash(git add:*), Bash(cat:*), Bash(ls:*), Read, Glob, Grep
 argument-hint: [티켓ID 또는 생략(자동감지)]
 ---
 
@@ -70,17 +70,25 @@ feat(WM-XXXXX): 자동완성에서 Google 계정 제외 처리
 - 50자 이내 권장 (최대 72자)
 - "~추가", "~수정", "~삭제", "~개선" 등 명사형 종결
 
-### Step 3 — 커밋 실행 (사용자 승인 시에만)
+### Step 3 — 수동 커밋 안내
 
-사용자가 메시지를 선택/수정하면:
-1. `git commit -m "type(TICKET): 메시지"` 실행
-2. 커밋 결과 표시
+사용자가 메시지를 선택/수정하면 터미널에서 직접 커밋할 방법을 안내한다.
+**에이전트는 승인 여부와 관계없이 `git commit`을 실행하지 않는다.**
+커밋 완료를 기다릴 필요 없이 Step 4로 진행한다. 사용자가 직접 커밋했다고 알리면 `git status`와 `git log -1`로 확인한다.
 
-**사용자가 "skip"하면 커밋 없이 Step 4로 이동.**
+**사용자가 "skip"하면 메시지 선택 없이 Step 4로 이동.**
 
 ### Step 4 — PR 설명 생성
 
-`git diff master...HEAD`와 `git log master...HEAD`를 분석하여 PR 설명 생성:
+베이스는 `main`과 `master`를 모두 지원하며 다음 순서로 선택한다:
+
+1. `git symbolic-ref --quiet refs/remotes/origin/HEAD`가 유효한 `refs/remotes/origin/main` 또는 `refs/remotes/origin/master`를 반환하면 우선 사용한다.
+2. 없으면 `refs/heads/main`, `refs/heads/master`, `refs/remotes/origin/main`, `refs/remotes/origin/master` 순서로 `git rev-parse --verify "${candidate}^{commit}"`가 성공하는 첫 ref를 선택한다.
+3. 선택한 ref를 `BASE_REF`, 마지막 경로 요소(`main` 또는 `master`)를 `BASE_BRANCH`로 사용하고 선택한 베이스를 출력한다. fetch는 필요하지 않다.
+4. 후보가 모두 없으면 브랜치 비교를 실행하지 않고 베이스를 찾지 못했다고 안내한다.
+
+`git diff "$BASE_REF"...HEAD`와 `git log "$BASE_REF"..HEAD`를 분석하여 PR 설명을 생성한다.
+아직 커밋하지 않은 경우 `git diff --staged`도 반영하고, 미커밋 변경이 포함된 초안임을 표시한다:
 
 ```markdown
 # PR: {TICKET-ID} — {한줄 요약}
@@ -111,17 +119,19 @@ feat(WM-XXXXX): 자동완성에서 Google 계정 제외 처리
 ```
 === WM-XXXXX workfinish 완료 ===
 
-✓ 커밋: feat(WM-XXXXX): 자동완성에서 Google 계정 제외 처리
+✓ 커밋 메시지: feat(WM-XXXXX): 자동완성에서 Google 계정 제외 처리
 ✓ PR 설명 생성 완료 (위 내용 복사하여 사용)
 
-다음 단계:
+다음 단계 (사용자가 직접 실행):
+  선택한 메시지로 커밋 (아직 커밋하지 않았다면)
   git push origin feature/WM-XXXXX
   → GitHub에서 PR 생성 시 위 설명 붙여넣기
 ```
 
 ## 규칙
 
-- 커밋은 **사용자 승인 시에만** 실행 — 자동 커밋 절대 금지
+- 커밋·푸시는 **항상 사용자 직접 실행** — 승인 후에도 에이전트가 실행하지 않음
+- 실제 커밋을 확인하기 전에는 커밋 완료로 표시하지 않음
 - JWT/API 키를 채팅·PR에 절대 노출하지 않음
 - PR 설명은 한국어 (팀 Format A)
 - 변경 사항은 모듈/영역별 그룹핑

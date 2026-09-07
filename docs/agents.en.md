@@ -2,7 +2,7 @@
 
 Specialized agents that Claude Code spawns via the `Agent` tool. Each `.md` under [`agents/claude-code/`](../agents/claude-code/) is a self-contained agent definition — name, description, model, and system prompt.
 
-These are **not** invoked by the user directly — Claude picks one when a task matches the agent's `description`. The description acts as a router.
+In this repo, Claude delegates to these agents inside command workflows, using each agent's `description` to match the task. See the routing rules in [AGENTS.md](../AGENTS.md).
 
 > 한국어: [agents.kr.md](./agents.kr.md)
 
@@ -47,7 +47,7 @@ If you build a new agent, pick the cheapest tier that gives correct output on yo
 ## Conventions
 
 - Filename = `name:` field in frontmatter (kebab-case).
-- The `description:` field is the only thing Claude reads when deciding whether to invoke — write it as routing copy ("Use this agent when…"), not generic prose.
+- The `description:` field describes when Claude should invoke the agent — write it as routing copy ("Use this agent when…"), not generic prose.
 - Include 2–3 example inputs in the description so Claude pattern-matches reliably.
 
 ## Adding a new agent
@@ -62,4 +62,8 @@ If you build a new agent, pick the cheapest tier that gives correct output on yo
    ---
    ```
 2. Write the system prompt body. Keep it focused — one job per agent.
-3. Re-run `./install.sh` to symlink to `~/.claude/agents/claude-code/`.
+3. Re-run `./install.sh` to symlink to `~/.claude/agents/`.
+
+## Python API agents
+
+Five separate CLI implementations live in [`agents/python/`](../agents/python/). Each requires Python 3.10+, the `anthropic` SDK, and `ANTHROPIC_API_KEY`; even `--demo` calls the API. Invalid JSON/schema responses fail before result storage. See each agent’s README and the [offline checks](scripts.en.md).

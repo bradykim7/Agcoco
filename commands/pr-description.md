@@ -1,6 +1,6 @@
 ---
 description: 팀 컨벤션에 맞는 PR 설명 자동 생성 (티켓 ID 자동 감지, git diff 기반)
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*)
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git symbolic-ref:*), Bash(git merge-base:*)
 argument-hint: [티켓 ID 또는 추가 컨텍스트]
 ---
 
@@ -17,10 +17,18 @@ argument-hint: [티켓 ID 또는 추가 컨텍스트]
 - 티켓 ID를 찾을 수 없으면 사용자에게 입력 요청
 
 ### 2단계: 베이스 브랜치와의 차이 분석
-- `git merge-base master HEAD`로 분기 지점 확인
-- `git log master...HEAD --oneline`으로 브랜치 내 모든 커밋 확인
-- `git diff master...HEAD --stat`으로 변경 파일 목록 확인
-- `git diff master...HEAD`으로 전체 변경 내용 분석
+
+베이스는 `main`과 `master`를 모두 지원하며 다음 순서로 선택한다:
+
+1. `git symbolic-ref --quiet refs/remotes/origin/HEAD`가 유효한 `refs/remotes/origin/main` 또는 `refs/remotes/origin/master`를 반환하면 우선 사용한다.
+2. 없으면 `refs/heads/main`, `refs/heads/master`, `refs/remotes/origin/main`, `refs/remotes/origin/master` 순서로 `git rev-parse --verify "${candidate}^{commit}"`가 성공하는 첫 ref를 선택한다.
+3. 선택한 ref를 `BASE_REF`, 마지막 경로 요소(`main` 또는 `master`)를 `BASE_BRANCH`로 사용하고 선택한 베이스를 출력한다. fetch는 필요하지 않다.
+4. 후보가 모두 없으면 브랜치 비교를 실행하지 않고 베이스를 찾지 못했다고 안내한다.
+
+- `git merge-base "$BASE_REF" HEAD`로 분기 지점 확인
+- `git log "$BASE_REF"..HEAD --oneline`으로 브랜치 내 모든 커밋 확인
+- `git diff "$BASE_REF"...HEAD --stat`으로 변경 파일 목록 확인
+- `git diff "$BASE_REF"...HEAD`으로 전체 변경 내용 분석
 
 ### 3단계: 변경 사항 분류
 변경된 파일들을 모듈/영역별로 그룹핑:

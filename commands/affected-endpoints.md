@@ -1,6 +1,6 @@
 ---
 description: 코드 변경으로 영향받는 HTTP 엔드포인트를 추적합니다
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Grep, Glob, Read
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git symbolic-ref:*), Grep, Glob, Read
 argument-hint: [파일 경로 또는 티켓 ID]
 ---
 
@@ -12,11 +12,18 @@ argument-hint: [파일 경로 또는 티켓 ID]
 
 ### 1단계: 변경 파일 목록 수집
 
+베이스는 `main`과 `master`를 모두 지원하며 다음 순서로 선택한다:
+
+1. `git symbolic-ref --quiet refs/remotes/origin/HEAD`가 유효한 `refs/remotes/origin/main` 또는 `refs/remotes/origin/master`를 반환하면 우선 사용한다.
+2. 없으면 `refs/heads/main`, `refs/heads/master`, `refs/remotes/origin/main`, `refs/remotes/origin/master` 순서로 `git rev-parse --verify "${candidate}^{commit}"`가 성공하는 첫 ref를 선택한다.
+3. 선택한 ref를 `BASE_REF`, 마지막 경로 요소(`main` 또는 `master`)를 `BASE_BRANCH`로 사용하고 선택한 베이스를 출력한다. fetch는 필요하지 않다.
+4. 후보가 모두 없으면 브랜치 비교를 실행하지 않고 베이스를 찾지 못했다고 안내한다.
+
 **우선순위 순서로 변경 파일을 수집:**
 
 1. `$ARGUMENTS`가 특정 파일 경로이면 해당 파일만 대상
 2. 스테이징된 파일이 있으면: `git diff --staged --name-only`
-3. 브랜치가 master가 아니면: `git diff master...HEAD --name-only`
+3. 유효한 `BASE_REF`가 있고 현재 브랜치가 `BASE_BRANCH`와 다르면: `git diff "$BASE_REF"...HEAD --name-only` (비어 있으면 다음 순위로 이동)
 4. 스테이징 안 된 변경이 있으면: `git diff --name-only`
 5. 위 모두 없으면 사용자에게 안내
 

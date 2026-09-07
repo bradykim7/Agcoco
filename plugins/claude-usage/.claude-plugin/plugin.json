@@ -1,5 +1,5 @@
 {
   "name": "claude-usage",
-  "description": "Claude Code 사용량 분석 도구. claude-usage-collect(데이터 수집), claude-usage-analyze(개인 리포트), claude-usage-report(팀 통합 리포트) 포함.",
-  "version": "1.0.0"
+  "description": "Claude Code 사용량 분석 도구. claude-usage-collect(데이터 수집), claude-usage-analyze(개인 리포트) 포함.",
+  "version": "1.0.1"
 }

@@ -37,23 +37,24 @@ case "$SUBCMD" in
 
         # 언어/타입 감지
         if [ -f "$TARGET_DIR/composer.json" ]; then
-            LANG="PHP"; TYPE="PHP Project"
+            PROJECT_LANG="PHP"; TYPE="PHP Project"
         elif [ -f "$TARGET_DIR/package.json" ]; then
-            LANG="TypeScript/JavaScript"; TYPE="Node.js Project"
+            PROJECT_LANG="TypeScript/JavaScript"; TYPE="Node.js Project"
         elif [ -f "$TARGET_DIR/pom.xml" ] || [ -f "$TARGET_DIR/build.gradle" ]; then
-            LANG="Java"; TYPE="Java Project"
+            PROJECT_LANG="Java"; TYPE="Java Project"
         elif [ -f "$TARGET_DIR/requirements.txt" ] || [ -f "$TARGET_DIR/pyproject.toml" ]; then
-            LANG="Python"; TYPE="Python Project"
+            PROJECT_LANG="Python"; TYPE="Python Project"
         elif [ -f "$TARGET_DIR/go.mod" ]; then
-            LANG="Go"; TYPE="Go Project"
+            PROJECT_LANG="Go"; TYPE="Go Project"
         elif [ -f "$TARGET_DIR/Cargo.toml" ]; then
-            LANG="Rust"; TYPE="Rust Project"
+            PROJECT_LANG="Rust"; TYPE="Rust Project"
         else
-            LANG="Unknown"; TYPE="Project"
+            PROJECT_LANG="Unknown"; TYPE="Project"
         fi
 
         # 디렉토리 구조 (1레벨)
-        DIR_TREE=$(cd "$TARGET_DIR" && ls -d */ 2>/dev/null | head -10 | sed 's/^/├── /' || echo "├── (empty)")
+        DIR_TREE=$(cd "$TARGET_DIR" && ls -d */ 2>/dev/null | head -10 | sed 's/^/├── /')
+        [ -z "$DIR_TREE" ] && DIR_TREE="├── (empty)"
 
         # 템플릿으로 CLAUDE.md 생성
         cat > "$CLAUDE_MD" << CLAUDEEOF
@@ -65,7 +66,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 - **Project**: $PROJECT_NAME
 - **Type**: $TYPE
-- **Language**: $LANG
+- **Language**: $PROJECT_LANG
 - **Remote**: $GIT_REMOTE
 
 ## Directory Structure
@@ -166,6 +167,14 @@ echo "=== AI Agent Dotfiles Installer ==="
 echo "  멀티툴 지원: tools/*.sh 에 정의된 모든 CLI를 자동 감지하여 symlink"
 echo ""
 
+# Git 훅을 연결하기 전에 파서 의존성을 확인한다.
+if ! command -v shfmt >/dev/null 2>&1; then
+    echo "[✗] Git 차단기에 shfmt 3가 필요합니다."
+    echo "    macOS: brew install shfmt"
+    echo "    Linux: https://github.com/mvdan/sh#shfmt"
+    exit 1
+fi
+
 # Step 1: Claude Code 부트스트랩 — primary tool 이므로 미설치 시 npm 자동 설치 제안
 #         (다른 툴들은 사용자가 직접 설치한 경우에만 symlink 됨)
 if ! command -v claude &> /dev/null; then
@@ -199,7 +208,7 @@ echo ""
 # 리포는 skills/<category>/<name>/ 로 분류해두므로 그대로 두면 카테고리 디렉토리가
 # 스킬 이름 자리를 차지해 아무것도 발견되지 않는다. 최상위에 이름별 심링크를
 # 만들어 분류와 탐색을 동시에 만족시킨다.
-#   - 상대 심링크라 리포에 커밋되며 다른 머신에서도 그대로 동작
+#   - 심링크는 gitignore 된 빌드 산출물 — 커밋되지 않으며 install.sh 실행 시마다 재생성
 #   - Step 2 에서 skills/ 디렉토리 전체를 심링크하므로 Claude/Codex 양쪽에 함께 적용됨
 #   - `.system/` 은 Claude 가 관리하는 내부 스킬이라 건드리지 않음 (글롭이 dotfile 미매치)
 SKILLS_DIR="$DOTFILES_DIR/skills"
@@ -288,7 +297,7 @@ install_tool() {
     echo "[*] $TOOL_NAME 감지됨 → $TOOL_DIR/ 설정"
     mkdir -p "$TOOL_DIR"
 
-    local entry target_rel source_rel target_path source_path
+    local entry target_rel source_rel target_path source_path backup_path backup_index
     for entry in "${TOOL_SYMLINKS[@]}"; do
         target_rel="${entry%%=*}"
         source_rel="${entry#*=}"
@@ -302,8 +311,14 @@ install_tool() {
 
         # 기존 실제 파일/디렉토리는 .bak 백업
         if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
-            echo "    기존 $target_rel 백업 → $target_rel.bak"
-            mv "$target_path" "$target_path.bak"
+            backup_path="$target_path.bak"
+            backup_index=1
+            while [ -e "$backup_path" ] || [ -L "$backup_path" ]; do
+                backup_path="$target_path.bak.$backup_index"
+                backup_index=$((backup_index + 1))
+            done
+            echo "    기존 $target_rel 백업 → $backup_path"
+            mv "$target_path" "$backup_path"
         elif [ -L "$target_path" ]; then
             rm "$target_path"
         fi

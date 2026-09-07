@@ -5,6 +5,10 @@ PR diff와 관련 코드를 분석해 리스크 중심 리뷰 노트를 생성�
 
 ## 실행
 
+Python 3.10+와 `anthropic` 패키지, `ANTHROPIC_API_KEY`가 필요합니다. 아래 명령은 해당 에이전트 디렉터리에서 실행합니다. `--demo`도 실제 API를 호출합니다.
+
+응답은 [공통 검증기](../shared/schema.py)로 필수 필드·중첩 타입·enum·추가 필드를 검사합니다. 위반하면 오류로 종료하며 결과 파일을 생성하거나 덮어쓰지 않습니다. 오프라인 검사는 저장소 루트에서 `python3 -B scripts/check-agent-regressions.py`로 실행합니다.
+
 ```bash
 # 데모
 python agent.py --demo
@@ -23,6 +27,8 @@ python agent.py \
   --checklist backward_compatibility n_plus_one null_handling \
   --output review.json
 ```
+
+`--context app/Mail/Service.php app/Contact/Service.php`처럼 이름이 같은 파일도 입력 경로별로 모두 전달됩니다.
 
 ## 체크리스트 항목
 
@@ -45,7 +51,7 @@ python agent.py \
   "risk_points": [
     {
       "title": "string",
-      "severity": "low | medium | high",
+      "severity": "high",
       "category": "string",
       "reason": "string",
       "evidence": ["string"],

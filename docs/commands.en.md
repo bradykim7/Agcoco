@@ -32,7 +32,7 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 | Command | Purpose |
 |---------|---------|
 | [`/commit-suggest`](../commands/commit-suggest.md) | Recommend a commit message from staged files + history |
-| [`/commit-mailplug`](../commands/commit-mailplug.md) | Team-convention commit (ticket ID auto-detected) |
+| [`/commit-mailplug`](../commands/commit-mailplug.md) | Recommend a team-convention commit message (ticket ID auto-detected) |
 | [`/pr-description`](../commands/pr-description.md) | Generate PR description from diff + commits |
 | [`/workfinish`](../commands/workfinish.md) | Commit-suggest + PR description in one run — "wrap up" |
 
@@ -53,6 +53,9 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 | Command | Purpose |
 |---------|---------|
 | [`/jira-daily`](../commands/jira-daily.md) | Analyze today's assigned Jira issues — macOS notification + plan doc |
+
+
+`/workfinish` recommends a message and drafts the PR description; commit and push are always manual. `/pr-description`, `/affected-endpoints`, and `/workfinish` support both `main` and `master`, preferring the valid `origin/HEAD` target. The `claude-usage` plugin ships collect/analyze only; the team report remains a personal-install command.
 
 ## Conventions
 

@@ -19,6 +19,7 @@ import anthropic
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.global_policy import GLOBAL_AGENT_POLICY
+from shared.schema import validate_schema
 from pr_review_assistant.prompt import PR_REVIEW_ASSISTANT_PROMPT, PR_REVIEW_ASSISTANT_SCHEMA
 
 # ---------------------------------------------------------------------------
@@ -51,10 +52,6 @@ def parse_json_response(text: str) -> dict:
         lines = text.splitlines()
         text = "\n".join(lines[1:-1]).strip()
     return json.loads(text)
-
-
-def validate_schema(data: dict) -> list[str]:
-    return [f for f in PR_REVIEW_ASSISTANT_SCHEMA["required"] if f not in data]
 
 
 def format_severity_summary(risk_points: list) -> str:
@@ -92,7 +89,7 @@ def run_pr_review(
         diff_text      : PR의 unified diff 텍스트
         pr_title       : PR 제목
         pr_description : PR 설명
-        context_files  : {"파일명": "전체 코드"} - diff 외 참고 파일
+        context_files  : {"파일 경로": "전체 코드"} - diff 외 참고 파일
         checklist      : 집중 검토 항목 목록
         repo           : 레포지토리명 (예: org/repo)
         pr_number      : PR 번호
@@ -165,9 +162,7 @@ def run_pr_review(
         print(f"[Raw response]\n{raw_text}")
         raise
 
-    missing = validate_schema(result)
-    if missing:
-        print(f"[Warning] 누락된 필드: {missing}")
+    validate_schema(result, PR_REVIEW_ASSISTANT_SCHEMA)
 
     risk_points = result.get("risk_points", [])
     print(f"\n[분석 완료] 리스크: {format_severity_summary(risk_points)}")
@@ -300,7 +295,7 @@ def main():
         context_files = {}
         for fpath in (args.context or []):
             with open(fpath, "r", encoding="utf-8") as f:
-                context_files[os.path.basename(fpath)] = f.read()
+                context_files[fpath] = f.read()
 
         result = run_pr_review(
             diff_text=diff_text,

@@ -19,6 +19,7 @@ import anthropic
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.global_policy import GLOBAL_AGENT_POLICY
+from shared.schema import validate_schema
 from consistency_check.prompt import CONSISTENCY_CHECK_PROMPT, CONSISTENCY_CHECK_SCHEMA
 
 # ---------------------------------------------------------------------------
@@ -40,10 +41,6 @@ def parse_json_response(text: str) -> dict:
         lines = text.splitlines()
         text = "\n".join(lines[1:-1]).strip()
     return json.loads(text)
-
-
-def validate_schema(data: dict) -> list[str]:
-    return [f for f in CONSISTENCY_CHECK_SCHEMA["required"] if f not in data]
 
 
 def format_statistics(stats: dict) -> str:
@@ -146,9 +143,7 @@ def run_consistency_check(
         print(f"[Raw response]\n{raw_text}")
         raise
 
-    missing = validate_schema(result)
-    if missing:
-        print(f"[Warning] 누락된 필드: {missing}")
+    validate_schema(result, CONSISTENCY_CHECK_SCHEMA)
 
     inconsistencies = result.get("inconsistencies", [])
     stats = result.get("statistics", {})

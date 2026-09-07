@@ -2,7 +2,7 @@
 
 Claude Code 가 `Agent` 도구로 호출하는 전문 에이전트. [`agents/claude-code/`](../agents/claude-code/) 의 각 `.md` 는 이름·설명·모델·시스템 프롬프트를 포함한 독립 정의 파일.
 
-사용자가 직접 부르는 것이 아니라, 작업이 해당 에이전트의 `description` 과 매치되면 Claude 가 선택합니다 — description 이 곧 라우터.
+이 저장소에서는 Claude가 커맨드 워크플로우 안에서 해당 에이전트의 `description`에 맞춰 작업을 위임합니다. 라우팅 규칙은 [AGENTS.md](../AGENTS.md)를 따릅니다.
 
 > English: [agents.en.md](./agents.en.md)
 
@@ -47,7 +47,7 @@ Claude Code 가 `Agent` 도구로 호출하는 전문 에이전트. [`agents/cla
 ## 규칙
 
 - 파일명 = frontmatter `name:` 필드 (kebab-case).
-- `description:` 은 Claude 가 라우팅 시 보는 유일한 텍스트 — 일반 산문이 아닌 "Use this agent when…" 라우팅 카피로 작성.
+- `description:` 은 에이전트를 언제 호출할지 설명하는 텍스트 — 일반 산문이 아닌 "Use this agent when…" 라우팅 카피로 작성.
 - description 에 예시 입력 2–3 개 포함 → Claude 가 패턴 매칭을 안정적으로 수행.
 
 ## 새 에이전트 추가
@@ -62,4 +62,8 @@ Claude Code 가 `Agent` 도구로 호출하는 전문 에이전트. [`agents/cla
    ---
    ```
 2. 시스템 프롬프트 본문 작성. 에이전트 하나당 한 가지 일에 집중.
-3. `./install.sh` 재실행 → `~/.claude/agents/claude-code/` 로 심링크.
+3. `./install.sh` 재실행 → `~/.claude/agents/` 로 심링크.
+
+## Python API 에이전트
+
+[`agents/python/`](../agents/python/)에는 별도의 CLI 구현 5개가 있습니다. Python 3.10+, `anthropic` SDK, `ANTHROPIC_API_KEY`가 필요하며 `--demo`도 실제 API를 호출합니다. JSON·스키마가 잘못된 응답은 결과 저장 전에 실패합니다. 개별 README와 [오프라인 검사](scripts.kr.md)를 참고하세요.

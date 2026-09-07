@@ -20,20 +20,22 @@
 agcoco/              ← 이 레포 (한 곳에 clone)
 ├── AGENTS.md                ← 모든 AI 에이전트가 공유하는 canonical 컨텍스트 (openclaw 패턴)
 ├── CLAUDE.md → AGENTS.md    ← Claude Code 이름으로 부르는 in-repo symlink
-├── commands/*.md            ← 슬래시 커맨드 정의 (20개)
+├── commands/*.md            ← 슬래시 커맨드 정의 (18개)
 ├── agents/claude-code/*.md  ← AI 서브에이전트 정의 (12개)
-├── skills/                  ← 자동 발동 스킬 (22개, mattpocock 포팅)
+├── skills/                  ← 자동 발동 스킬 (21개, mattpocock 포팅)
 ├── settings.json            ← 글로벌 설정
-└── tools/*.sh               ← 각 AI CLI 정의 (claude.sh, codex.sh, _template.sh)
+└── tools/*.sh               ← 각 AI CLI 정의 (claude.sh, codex.sh, codegraph.sh, ponytail.sh, _template.sh)
 
         │  install.sh — tools/*.sh 순회하며 설치된 CLI 자동 감지
         ▼
 
 ~/.claude/                   ← Claude Code 글로벌 디렉토리
 ├── CLAUDE.md     → agcoco/AGENTS.md
+├── DESIGN.md     → agcoco/DESIGN.md
 ├── commands/     → agcoco/commands/
 ├── agents/       → agcoco/agents/claude-code/
 ├── skills/       → agcoco/skills/
+├── hooks/        → agcoco/hooks/
 └── settings.json → agcoco/settings.json
 
 ~/.codex/                    ← Codex CLI 글로벌 디렉토리 (설치 시 자동 추가)
@@ -85,9 +87,11 @@ agents/claude-code/
 - **역할**: 특정 전문 분야에 특화된 AI 서브에이전트
 - **트리거 방법**: Claude가 작업 중 필요할 때 **자동으로** spawn
 - **사용자가 직접 호출하지 않음** — 커맨드가 내부적으로 호출
-- **Sonnet 모델 사용** — 메인 Opus보다 빠르고 저렴
+- **에이전트별 모델 지정** — Sonnet 8개, Haiku 3개, Opus 1개 ([목록](agents.kr.md))
 
 ### settings.json
+
+아래는 모델 설정 형식의 예시입니다. 현재 값은 저장소의 `settings.json`을 확인하세요.
 
 ```json
 {
@@ -141,7 +145,7 @@ cd ~/agcoco
 ./install.sh init ~/my-project
 ```
 
-프로젝트에 `CLAUDE.md` 가 생성되고, `.gitignore` 에 작업 디렉토리(`.handoffs/`, `.plans/`, `.research/`) 패턴이 등록됩니다.
+프로젝트에 `CLAUDE.md`가 생성됩니다. `.gitignore`가 이미 있을 때만 작업 디렉토리(`.handoffs/`, `.plans/`, `.research/`) 패턴을 추가합니다. `.gitignore`가 없으면 직접 만들고, 주석에만 패턴이 있는 경우도 실제 제외 여부를 확인하세요. 디렉토리 자체는 각 커맨드가 처음 저장할 때 생성합니다.
 `CLAUDE.md`의 TODO 항목을 프로젝트에 맞게 편집하세요.
 
 ---
@@ -193,7 +197,7 @@ cd ~/agcoco
 |--------|----------|
 | `/jira-daily` | 오늘 나에게 할당된 이슈를 받아 정리할 때 (Jira MCP 필요, 팀 환경 전용) |
 
-`scripts/jira-daily-setup.sh` 로 macOS LaunchAgent 에 등록하면 하루 2회 자동 실행됩니다.
+`scripts/jira-daily-setup.sh`로 macOS LaunchAgent에 등록합니다. 기본값은 평일 `08:30`, `13:30`이며 시간을 변경할 수 있습니다.
 
 ### Claude Code 사용 통계
 
@@ -204,6 +208,8 @@ Claude Code 자체의 사용량 (토큰/모델/세션/비용)을 집계/분석�
 | `/claude-usage-collect` | 팀 집계에 참여할 때 — 본인 데이터를 zip으로 패키징 (대화 내용 없음) |
 | `/claude-usage-analyze` | 본인 사용을 점검할 때 — 라우팅/세션 위생/ROI 개인 리포트 |
 | `/claude-usage-report` | 팀 리포트를 만들 때 — 팀원 zip 수합 → 8섹션 분석 (+Confluence 옵션) |
+
+`claude-usage` 플러그인은 collect/analyze만 포함합니다. 팀 보고서 커맨드는 개인 설치(심링크)에만 포함됩니다.
 
 **사전 요건**: `npx` (Node.js) / `jq` / `zip`. 첫 실행 시 ccusage 패키지가 ~30초 동안 다운로드됩니다.
 
@@ -228,7 +234,7 @@ Claude Code 자체의 사용량 (토큰/모델/세션/비용)을 집계/분석�
 
 | 에이전트 | 하는 일 | 호출하는 커맨드 |
 |----------|--------|---------------|
-| `docs-locator` | 과거 계획서/리서치/핸드오프 검색 | create-plan, research, resume-handoff, debug |
+| `docs-locator` | 과거 계획서/리서치/핸드오프 검색 | create-plan, research, resume-handoff, implement-plan, iterate-plan |
 | `docs-analyzer` | 과거 문서에서 인사이트 추출 | resume-handoff, iterate-plan |
 
 ### 리뷰 & 분석 에이전트
@@ -280,7 +286,7 @@ Claude (Opus):
 /resume-handoff                       ← 어제 컨텍스트 복원
 /implement-plan                       ← Phase 2 이어서 구현
 /validate-plan                        ← 구현 결과 전체 검증
-/workfinish                           ← 커밋 + PR 설명 생성
+/workfinish                           ← 커밋 메시지 추천 + PR 설명 생성
 ```
 
 ### 시나리오: 빠른 버그 수정
@@ -288,7 +294,7 @@ Claude (Opus):
 ```
 /debug 로그인 실패 에러               ← 원인 조사
 # 수정 작업...
-/workfinish                           ← 커밋 + PR
+/workfinish                           ← 커밋 메시지 추천 + PR 설명
 ```
 
 ### 시나리오: 팀 Claude Code 사용 리포트
@@ -331,6 +337,10 @@ Claude에게 주는 지시문을 여기에 작성...
 ```
 
 ---
+
+## 검증
+
+저장소 변경 뒤에는 [회귀검사와 플러그인 동기화 검사](scripts.kr.md)를 실행합니다. 재설치할 때 기존 설정은 `.bak`, `.bak.1`, `.bak.2`처럼 겹치지 않는 이름으로 보존합니다.
 
 ## 참고
 

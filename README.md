@@ -134,10 +134,12 @@ Ported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). Ski
 
 ### Plugins (6)
 
+The `claude-usage` pack includes collect/analyze. The team report and Jira command remain personal-install commands.
+
 Commands and skills also ship as installable plugin packs in `plugins/`. Cherry-pick a pack — you don't have to adopt the whole config.
 
 ```bash
-/plugin marketplace add mskim/Agcoco
+/plugin marketplace add bradykim7/Agcoco
 /plugin install engineering-skills@agcoco
 /plugin install workflow@agcoco
 ```
@@ -148,8 +150,10 @@ Non-LLM scripts that run on tool invocation or session events. The agent doesn't
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `block-dangerous-git.sh` | PreToolUse: Bash | Block `git commit/push/filter-repo/reset --hard` — require human approval |
+| `block-dangerous-git.sh` | PreToolUse: Bash | Block `git commit/push/filter-repo/reset --hard` — commit/push are always manual |
 | `session-start-ticket-context.sh` | SessionStart | On a Jira-style ticket branch, surface that ticket's docs — from a shared ticket-docs root (`$TICKET_DOCS_ROOT`) if there is one, else from `.plans/`, `.handoffs/`, `.research/` |
+
+The Git guard requires Bash, jq, Python 3, and [shfmt 3](https://github.com/mvdan/sh#shfmt) (`brew install shfmt` on macOS). It parses shell syntax without executing it; keep `git-command-guard.py` beside the shell hook when copying it manually.
 
 ## Multi-Tool Support (`tools/` registry)
 
@@ -159,7 +163,7 @@ Tool-agnostic — `install.sh` runs a generic loop over `tools/*.sh`, auto-detec
 
 | File | Tool | Detection | Symlinks created |
 |---|---|---|---|
-| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `commands`, `agents`, `skills`, `settings.json` |
+| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (same SKILL.md format) |
 | `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | none — bootstrapped through the adapter's `TOOL_SETUP` hook |
 | `tools/ponytail.sh` | Ponytail plugin | `command -v claude` | none — installed from the plugin marketplace by `TOOL_SETUP` |
@@ -196,11 +200,23 @@ Plain Markdown on disk is the memory. Plans, research notes, and handoffs all li
 ./install.sh init /path/to/project
 ```
 
-Creates `CLAUDE.md` in the target project, and registers `.handoffs/`, `.plans/`, `.research/` in its `.gitignore`. The directories themselves are made on demand by `/handoff`, `/research`, and `/create-plan`.
+Creates `CLAUDE.md` in the target project and adds `.handoffs/`, `.plans/`, `.research/` patterns only if `.gitignore` already exists. Create it manually if absent, and verify that the paths are ignored: the duplicate check also matches comment text. The directories themselves are made on demand by `/handoff`, `/research`, and `/create-plan`.
+
+## Verification
+
+Run from the repository root (Python 3.10+, Bash, Git, jq, shfmt 3):
+
+```bash
+python3 -B scripts/check-agent-regressions.py
+python3 -B scripts/check-shell-regressions.py
+bash scripts/check-plugin-sync.sh
+```
+
+These checks make no API calls or launchd registrations. See [Scripts](docs/scripts.en.md) for coverage.
 
 ## Output
 
-Every workflow produces a concrete file or message — not just a chat reply. Commit messages follow team convention, PR descriptions write themselves, test reports get checked in for the next session to read.
+Every workflow produces a concrete file or message — not just a chat reply. Commit messages follow team convention, PR descriptions write themselves, reports remain as local artifacts for later sessions. Commit and push are always performed manually by the user.
 
 ## Docs
 
@@ -208,7 +224,7 @@ Every workflow produces a concrete file or message — not just a chat reply. Co
 - [Slash Commands](docs/commands.en.md) ([KR](docs/commands.kr.md)) — 18 commands grouped by category
 - [Sub-agents](docs/agents.en.md) ([KR](docs/agents.kr.md)) — 12 specialized agents Claude spawns
 - [Hooks](docs/hooks.en.md) ([KR](docs/hooks.kr.md)) — 2 lifecycle hook scripts
-- [Scripts](docs/scripts.en.md) ([KR](docs/scripts.kr.md)) — Standalone shell helpers
+- [Scripts](docs/scripts.en.md) ([KR](docs/scripts.kr.md)) — Standalone shell and Python helpers
 - [Plugins](docs/plugins.en.md) ([KR](docs/plugins.kr.md)) — 6 plugin marketplace bundles
 
 ### Guides

@@ -19,6 +19,7 @@ import anthropic
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.global_policy import GLOBAL_AGENT_POLICY
+from shared.schema import validate_schema
 from architecture_review.prompt import ARCHITECTURE_REVIEW_PROMPT, ARCHITECTURE_REVIEW_SCHEMA
 
 # ---------------------------------------------------------------------------
@@ -40,10 +41,6 @@ def parse_json_response(text: str) -> dict:
         lines = text.splitlines()
         text = "\n".join(lines[1:-1]).strip()
     return json.loads(text)
-
-
-def validate_schema(data: dict) -> list:
-    return [f for f in ARCHITECTURE_REVIEW_SCHEMA["required"] if f not in data]
 
 
 def format_risk_summary(risks: list) -> str:
@@ -140,9 +137,7 @@ def run_architecture_review(
         print(f"[Raw response]\n{raw_text}")
         raise
 
-    missing = validate_schema(result)
-    if missing:
-        print(f"[Warning] 누락된 필드: {missing}")
+    validate_schema(result, ARCHITECTURE_REVIEW_SCHEMA)
 
     risks = result.get("risks", [])
     tradeoffs = result.get("tradeoffs", [])

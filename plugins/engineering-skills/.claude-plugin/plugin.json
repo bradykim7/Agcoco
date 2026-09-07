@@ -1,5 +1,5 @@
 {
   "name": "engineering-skills",
   "description": "엔지니어링 워크플로우 스킬 모음. diagnose, tdd, triage, to-prd, to-issues, zoom-out, improve-codebase-architecture, prototype, grill-with-docs, grill-me 포함.",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

@@ -1,5 +1,5 @@
 #!/bin/bash
-# plugins/ 사본이 commands/ 원본에서 벗어났는지 검사한다.
+# plugins/ 사본이 commands/, skills/, agents/claude-code/ 원본에서 벗어났는지 검사한다.
 #
 # 왜 필요한가: plugins/ 는 심링크가 아니라 실물 복사본이다 (마켓플레이스로 배포되므로
 # 리포 밖에서도 자립해야 한다). 그래서 commands/ 를 고쳐도 사본은 조용히 뒤처진다.
@@ -27,6 +27,7 @@ DIVERGENT=()
 # 의도적으로 어느 플러그인에도 넣지 않는 커맨드.
 UNPUBLISHED=(
     "jira-daily.md|Mailplug 전용 — jira-auth-proxy MCP, WM- 티켓, mailFramework 경로에 결합"
+    "claude-usage-report.md|팀원 실명·내부 Confluence 페이지 ID 포함 — 공개 배포 불가"
 )
 
 is_listed() {
@@ -85,6 +86,76 @@ for src in commands/*.md; do
         echo "           배포하지 않을 것이면 UNPUBLISHED 에 사유와 함께 추가하라"
         fail=1
     fi
+done
+
+echo ""
+echo "=== 3. 플러그인 스킬 사본 vs skills/ 원본 ==="
+for copy in plugins/*/skills/*/; do
+    copy=${copy%/}
+    [ -d "$copy" ] || continue
+    name=$(basename "$copy")
+    # 원본은 카테고리 디렉토리 안에 있다 (skills/engineering/<name>/ 등).
+    # skills/ 최상위의 평탄화 심링크는 -type d 에 걸리지 않으므로 중복 매칭 없음.
+    src=$(find skills -mindepth 2 -maxdepth 2 -type d -name "$name" | head -1)
+
+    if [ -z "$src" ]; then
+        echo "  [고아] $copy — skills/<카테고리>/ 에 원본이 없다"
+        fail=1
+        continue
+    fi
+
+    diff -rq "$src" "$copy" >/dev/null 2>&1 && continue
+
+    if is_listed "$copy" ${DIVERGENT[@]+"${DIVERGENT[@]}"}; then
+        for entry in ${DIVERGENT[@]+"${DIVERGENT[@]}"}; do
+            [ "${entry%%|*}" = "$copy" ] && echo "  [의도된 차이] $copy — ${entry#*|}"
+        done
+    else
+        echo "  [드리프트] $copy — 원본($src)과 다른데 사유가 등록돼 있지 않다"
+        echo "             동기화하려면: rm -rf $copy && cp -R $src $copy"
+        echo "             의도된 차이라면 이 스크립트의 DIVERGENT 에 사유와 함께 추가하라"
+        fail=1
+    fi
+done
+
+echo ""
+echo "=== 4. 플러그인 에이전트 사본 vs agents/claude-code/ 원본 ==="
+for copy in plugins/*/agents/*.md; do
+    [ -f "$copy" ] || continue
+    src="agents/claude-code/$(basename "$copy")"
+
+    if [ ! -f "$src" ]; then
+        echo "  [고아] $copy — agents/claude-code/ 에 원본이 없다"
+        fail=1
+        continue
+    fi
+
+    diff -q "$copy" "$src" >/dev/null && continue
+
+    if is_listed "$copy" ${DIVERGENT[@]+"${DIVERGENT[@]}"}; then
+        for entry in ${DIVERGENT[@]+"${DIVERGENT[@]}"}; do
+            [ "${entry%%|*}" = "$copy" ] && echo "  [의도된 차이] $copy — ${entry#*|}"
+        done
+    else
+        echo "  [드리프트] $copy — 원본과 다른데 사유가 등록돼 있지 않다"
+        echo "             동기화하려면: cp $src $copy"
+        echo "             의도된 차이라면 이 스크립트의 DIVERGENT 에 사유와 함께 추가하라"
+        fail=1
+    fi
+done
+
+echo ""
+echo "=== 5. 커맨드가 참조하는 커스텀 에이전트 포함 여부 ==="
+for pack in plugins/*; do
+    [ -d "$pack/commands" ] || continue
+    for src in agents/claude-code/*.md; do
+        [ -f "$src" ] || continue
+        name=$(basename "$src" .md)
+        if grep -Fq "\`$name\`" "$pack"/commands/*.md 2>/dev/null && [ ! -f "$pack/agents/$name.md" ]; then
+            echo "  [누락] $pack — 커맨드가 참조하는 에이전트 $name 이 없다"
+            fail=1
+        fi
+    done
 done
 
 echo ""

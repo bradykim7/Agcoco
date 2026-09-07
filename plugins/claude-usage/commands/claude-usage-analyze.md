@@ -1,6 +1,6 @@
 ---
 description: 본인 Claude Code 사용 분석 — ccusage 기반 모델 라우팅/세션 위생/ROI 리포트
-allowed-tools: Bash(npx:*), Bash(ccusage:*), Bash(mkdir:*), Bash(ls:*), Bash(whoami:*), Bash(date:*), Bash(jq:*), Bash(test:*), Read, Write, Glob, Grep
+allowed-tools: Bash(npx:*), Bash(ccusage:*), Bash(mkdir:*), Bash(ls:*), Bash(whoami:*), Bash(date:*), Bash(jq:*), Bash(test:*), Read, Write, Glob, Grep, WebFetch
 argument-hint: [기간 생략 가능, 예: 14d / 30d / 2026-04-10:2026-04-24]
 ---
 
@@ -74,15 +74,24 @@ jq로 모델별 토큰 집계:
 
 #### 3-4. 비용 / Cost
 
-공개 API 가격 (per 1M):
-| 모델 | Input | Output |
-|---|---|---|
-| Opus (4.6/4.7) | $15 | $75 |
-| Sonnet 4.6 | $3 | $15 |
-| Haiku 4.5 | $1 | $5 |
+공개 API 가격 (USD / 1M tokens, 2026-09-07 확인):
 
-- API 환산 총액
-- Max 5× ($100/월) 대비 ROI = API환산 / $100
+| 모델 | Input | Output | Cache read | Cache write (5분) |
+|---|---|---|---|---|
+| Opus 4 / 4.1 | $15 | $75 | $1.50 | $18.75 |
+| Opus 4.5 / 4.6 / 4.7 / 4.8 / 5 | $5 | $25 | $0.50 | $6.25 |
+| Sonnet 4 / 4.5 / 4.6 | $3 | $15 | $0.30 | $3.75 |
+| Sonnet 5 | $2 | $10 | $0.20 | $2.50 |
+| Haiku 4.5 | $1 | $5 | $0.10 | $1.25 |
+| Fable 5 / Mythos 5 | $10 | $50 | $1 | $12.50 |
+| Fable 5.1 / Mythos 5.1 | $10 | $50 | $0.25 | $12.50 |
+
+출처: [Anthropic 공식 요금표](https://platform.claude.com/docs/en/about-claude/pricing).
+실행 시 공식 요금표를 확인하고 적용 단가·확인일을 기록한다. 확인할 수 없는 모델은 다른 모델 단가로 대체하지 않고 비용 미확인으로 표시한다.
+
+- API 환산 총액: 일반 입력·출력·캐시 읽기·캐시 생성 토큰에 각각의 단가를 적용한 합계. 캐시 생성 1시간 단가는 Input의 2배이며, 캐시 기간을 확인할 수 없으면 적용 가정을 표시한다.
+- 구독료 대비 환산 비율(이하 ROI) = API 환산액 / **같은 분석 기간의 구독료**. 월별로 비교하며, 일부 월은 일할 환산한 추정치임을 표시한다. 실제 구독료가 확인되지 않으면 금액 가정을 명시한다.
+- 비용 미확인 모델이 포함되면 전체 ROI 자동 판정을 생략한다. API 환산액은 생산성이나 실제 절감액을 직접 측정한 값이 아니다.
 - `$/M tokens` (개인 단가)
 
 ### Step 4: 인사이트 도출
@@ -95,8 +104,8 @@ jq로 모델별 토큰 집계:
 | Opus > 95% | 🟡 모델 다변화 여지 |
 | 최장 세션 5d+ | 🔴 세션 위생 점검 |
 | 세션당 < 20k | 🟡 세션 깊이 얕음 |
-| ROI < 1.0 | 🟡 Pro 다운그레이드 고려 |
-| ROI > 5.0 | 🟢 Max 5× 매우 효율적 |
+| ROI < 1.0 | 🟡 동일 기간 구독료보다 API 환산액이 낮음 |
+| ROI > 5.0 | 🟢 동일 기간 구독료의 5배 이상인 API 환산액 |
 | Active day 비율 < 30% | 🟡 사용 정착 미흡 |
 
 ### Step 5: 리포트 생성
@@ -124,16 +133,13 @@ type: claude-usage-personal
 | Active days | {active}/{total_days} |
 | Tokens/session | {avg} |
 | API 환산 | ${cost} |
-| Max 5× ROI | {roi}× |
+| 구독료 대비 API 환산 비율 | {roi}× (동일 기간 구독료 ${subscription_cost}) |
 
 ## 모델 라우팅 / Model Routing
 
 | 모델 | 비중 | Input | Output |
 |---|---|---|---|
-| Opus 4.7 | {%} | ... | ... |
-| Opus 4.6 | ... | ... | ... |
-| Sonnet 4.6 | ... | ... | ... |
-| Haiku 4.5 | ... | ... | ... |
+| {실제 관측한 모델별로 한 행씩} | {%} | {input} | {output} |
 
 **플래그**: {🔴/🟡/🟢 자동 판정}
 
@@ -171,7 +177,7 @@ type: claude-usage-personal
 
 핵심 수치:
   Total: 13.4M tokens / 62 sessions / 12 active days
-  ROI: 9.3× (Max 5× 대비 매우 효율)
+  ROI: 9.3× (동일 기간 구독료 대비 API 환산 비율)
 
 🔴 발견된 이슈:
   - Haiku 1.8% → 경량 작업 라우팅 개선 여지

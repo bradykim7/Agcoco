@@ -60,6 +60,8 @@
 
 **플로우**: 팀원들이 `collect` 실행 → zip 수합 → 팀장이 `report`로 통합 분석. 개인은 `analyze`로 스스로 점검.
 
+> `claude-usage` 플러그인 팩은 `collect` + `analyze`만 포함합니다. `/claude-usage-report`는 팀원 실명·내부 Confluence 정보가 포함되어 팩에서 제외 — 개인 설치(심링크) 전용.
+
 ### Jira 자동화 커맨드
 
 | 커맨드 | 용도 | 입력 예시 |
@@ -80,10 +82,10 @@
 git checkout -b feature/WM-XXXXX
 # 코드 작업...
 
-/workfinish             ← 커밋 + PR 설명 생성
+/workfinish             ← 커밋 메시지 추천 + PR 설명 생성
 ```
 
-이것만으로 전체 플로우가 완료됩니다. 세부 제어가 필요하면 아래 개별 커맨드를 사용하세요.
+커밋 메시지와 PR 설명이 준비됩니다. 커밋·푸시는 사용자가 터미널에서 직접 실행합니다. 세부 제어가 필요하면 아래 개별 커맨드를 사용하세요.
 
 ---
 
@@ -97,7 +99,7 @@ git checkout -b feature/WM-XXXXX
 /implement-plan               ← 3. Phase별 구현 + 자동 검증
 /validate-plan                ← 4. 구현 결과 전체 검증
 /debug 에러 설명              ←    문제 발생 시 병렬 조사
-/workfinish                   ← 5. 커밋 + PR 생성
+/workfinish                   ← 5. 커밋 메시지 추천 + PR 설명 생성
 /handoff                      ← 6. 세션 종료 시 인수인계
 /resume-handoff               ←    다음 세션에서 이어서
 ```
@@ -129,9 +131,9 @@ Claude (Opus):
 
 # 생성되는 것:
 #   CLAUDE.md       ← 프로젝트별 AI 지침 (TODO 항목 편집)
-#   .handoffs/      ← 핸드오프 문서 저장소
-#   .plans/         ← 구현 계획서 저장소
-#   .research/      ← 리서치 문서 저장소
+#   기존 .gitignore ← 개인 문서 제외 패턴 추가 (파일이 없으면 직접 생성 필요)
+#
+# .handoffs/, .plans/, .research/는 해당 커맨드가 처음 저장할 때 생성된다.
 ```
 
 ---
@@ -147,7 +149,7 @@ Claude (Opus):
 | `codebase-analyzer` | 코드 구현 상세 분석 (데이터 흐름, 로직) | `/create-plan`, `/research`, `/debug` |
 | `codebase-locator` | 파일/컴포넌트 위치 탐색 (Super Grep) | `/create-plan`, `/research`, `/implement-plan`, `/debug` |
 | `codebase-pattern-finder` | 유사 구현/패턴 찾기 + 코드 예시 | `/create-plan`, `/research`, `/implement-plan` |
-| `docs-locator` | 과거 문서 탐색 (.plans/.research/.handoffs/) | `/create-plan`, `/research`, `/resume-handoff`, `/debug` |
+| `docs-locator` | 과거 문서 탐색 (.plans/.research/.handoffs/) | `/create-plan`, `/research`, `/resume-handoff`, `/implement-plan`, `/iterate-plan` |
 | `docs-analyzer` | 과거 문서 인사이트 추출 (의사결정, 제약) | `/resume-handoff`, `/iterate-plan` |
 | `web-search-researcher` | 웹 검색으로 최신 정보 조사 | 외부 API/라이브러리 정보 필요할 때 |
 | `architecture-review` | 아키텍처 제안 검토 & 리스크 분석 | 설계 문서 리뷰 시 |
@@ -165,7 +167,7 @@ Claude (Opus):
 사용자가 직접 호출           Claude가 자동 호출
 /create-plan 으로 실행      Claude가 필요할 때 spawn
 전체 워크플로우 정의         단일 전문 작업 수행
-Opus 모델 사용              Sonnet 모델 사용 (빠르고 저렴)
+현재 세션 모델 사용           에이전트별 지정 모델 사용
 ```
 
 ### 실제 동작 예시
@@ -184,7 +186,7 @@ Claude (Opus):
 
 ## 자동 스킬 (NEW — mattpocock/skills 포팅)
 
-스킬은 **프롬프트 내용으로 자동 호출**됩니다. 슬래시 커맨드로 부르지 않고, 사용자 발화가 스킬의 `description` 필드와 매칭되면 Claude가 알아서 트리거합니다.
+스킬은 사용자 발화와 `description`을 기준으로 호출합니다. `setup-matt-pocock-skills`와 `zoom-out`은 AGENTS.md의 예외 규칙에 따라 제안 후 확인을 받고 실행합니다.
 
 ### 커맨드 vs 에이전트 vs 스킬
 
@@ -200,7 +202,7 @@ Claude (Opus):
 
 | 카테고리 | 스킬 | 자동 호출 트리거 |
 |----------|------|------------------|
-| **engineering** | `setup-matt-pocock-skills` | 새 프로젝트에서 처음 실행 — issue tracker, 도메인 문서 위치를 다른 스킬들에게 알려주는 부트스트랩 |
+| **engineering** | `setup-matt-pocock-skills` | 새 프로젝트에서 사용자가 요청해 실행 — issue tracker, 도메인 문서 위치를 다른 스킬들에게 알려주는 부트스트랩 |
 | | `grill-with-docs` | "도메인 모델에 비추어 이 계획 까봐줘" |
 | | `to-prd` | "이 대화를 PRD로 만들어줘" |
 | | `to-issues` | "이 계획을 이슈로 쪼개줘" |
@@ -234,9 +236,9 @@ Claude (Opus):
 ### 새 프로젝트에서 시작하기
 
 ```
-1. ./install.sh init /path/to/project        ← CLAUDE.md 생성 + .gitignore 패턴 등록
+1. ./install.sh init /path/to/project        ← CLAUDE.md 생성 + 기존 .gitignore 패턴 추가
 2. cd /path/to/project
-3. (Claude 세션에서) "set up the engineering skills"  ← setup-matt-pocock-skills 자동 호출
+3. (Claude 세션에서) "set up the engineering skills"  ← setup-matt-pocock-skills 실행 요청
 4. AGENTS.md 또는 CLAUDE.md에 issue tracker, triage labels, 도메인 문서 경로 자동 기록됨
 5. 이후 tdd, triage, diagnose 등 다른 엔지니어링 스킬이 컨텍스트를 알고 동작
 ```
@@ -268,7 +270,7 @@ NoticeMailMemberDAO → NoticeMailService → AdminNoticeMailController
   → POST /api/v2/mail/admin/mails/notice
 ```
 
-### 3단계: 커밋
+### 3단계: 커밋 메시지 추천과 수동 커밋
 
 ```
 /commit-mailplug
@@ -285,7 +287,9 @@ NoticeMailMemberDAO → NoticeMailService → AdminNoticeMailController
 2. refactor(WM-XXXXX): 자동완성 쿼리에 account_type 조건 추가
 ```
 
-### 4단계: PR 생성
+추천 메시지를 확인한 뒤 사용자가 직접 커밋합니다. `/workfinish`도 커밋을 실행하지 않습니다.
+
+### 4단계: PR 설명 생성
 
 ```
 /pr-description
@@ -341,6 +345,18 @@ TEST_ENDPOINTS.md에서 verify 컬럼으로 직접 지정 가능:
 ```
 
 ---
+
+## 저장소 검증
+
+저장소 루트에서 실행합니다. Python 검사는 API를 호출하지 않습니다.
+
+```bash
+python3 -B scripts/check-agent-regressions.py
+python3 -B scripts/check-shell-regressions.py
+bash scripts/check-plugin-sync.sh
+```
+
+의존성과 검사 범위는 [scripts 문서](docs/scripts.kr.md)를 참고하세요.
 
 ## 환경 설정
 

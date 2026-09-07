@@ -2,7 +2,7 @@
 # PreToolUse: Bash — block destructive commands before Claude runs them.
 
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+COMMAND=$(printf '%s' "$INPUT" | jq -er '.tool_input.command // ""') || exit 2
 
 [ -z "$COMMAND" ] && exit 0
 
@@ -12,73 +12,14 @@ block() {
   exit 2
 }
 
-# ─── GIT: commit & push (always require human) ───────────────────────────────
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+commit([[:space:]]|$)'; then
-  block "git commit is reserved for the user. Stage changes and let the user commit manually."
-fi
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+push([[:space:]]|$)'; then
-  block "git push is reserved for the user. Run manually when ready."
-fi
-
-# ─── GIT: force push ──────────────────────────────────────────────────────────
-
-# Force push to main/master
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+push.*(--force|--force-with-lease|[[:space:]]-f([[:space:]]|$)).*(main|master)([[:space:]]|$)'; then
-  block "git push --force to main/master is irrecoverable."
-fi
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+push.*(main|master)([[:space:]]|$).*(--force|--force-with-lease|[[:space:]]-f([[:space:]]|$))'; then
-  block "git push --force to main/master is irrecoverable."
-fi
-
-# Delete remote branch
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]]+.*--delete'; then
-  block "git push --delete removes a remote branch permanently. Run manually if intentional."
-fi
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]]+.*:[[:space:]]*[a-zA-Z]'; then
-  block "git push origin :branch deletes a remote branch. Run manually if intentional."
-fi
-
-# ─── GIT: history rewrite ────────────────────────────────────────────────────
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+(filter-branch|filter-repo)'; then
-  block "git filter-branch/filter-repo rewrites history and is hard to recover from."
-fi
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+rebase.*(main|master)'; then
-  block "git rebase onto main/master rewrites commit history. Run manually if intentional."
-fi
-
-# Amend a pushed commit
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+commit[[:space:]]+.*--amend'; then
-  block "git commit --amend on a pushed commit causes divergence. Run manually if intentional."
-fi
-
-# ─── GIT: discard changes ────────────────────────────────────────────────────
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+reset[[:space:]]+--hard'; then
-  block "git reset --hard discards uncommitted work. Use 'git stash' or run manually if intentional."
-fi
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+clean[[:space:]]+(-[a-zA-Z]*f|--force)'; then
-  block "git clean -f permanently removes untracked files."
-fi
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+(checkout|restore)[[:space:]]+\.([[:space:]]|$)'; then
-  block "git checkout . / git restore . discards all uncommitted changes."
-fi
-
-# ─── GIT: branch deletion ────────────────────────────────────────────────────
-
-if echo "$COMMAND" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D[[:space:]]+(main|master)([[:space:]]|$)'; then
-  block "Refuse to force-delete main/master branch."
-fi
+# Commit and push are always manual, including Git global options.
+HOOK_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+python3 "$HOOK_DIR/git-command-guard.py" "$COMMAND" main,master || exit 2
 
 # ─── FILE SYSTEM: rm ─────────────────────────────────────────────────────────
 
 # rm -rf on root or home
-if echo "$COMMAND" | grep -qE 'rm[[:space:]]+(-[rRf]+|--recursive|--force).*[[:space:]](/|~)([[:space:]]|/?\*|$)'; then
+if echo "$COMMAND" | grep -qE 'rm[[:space:]]+(-[rRf]+|--recursive|--force).*[[:space:]](/|~)/?([[:space:]]|\*|$)'; then
   block "rm -rf on root or home directory."
 fi
 

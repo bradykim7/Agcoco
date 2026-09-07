@@ -2,9 +2,9 @@
 
 Bash scripts under [`hooks/`](../hooks/) wired into Claude Code's hook system. Each script runs at a specific lifecycle moment and can:
 
-- **block** an action (non-zero exit on a blocking hook),
-- **annotate** Claude's context (stdout on Stop / SessionStart hooks),
-- **warn the user** (stderr surfaces to the operator).
+- **block** a tool call (`exit 2` from `PreToolUse`),
+- **annotate** Claude's context (plain-text stdout on `SessionStart`),
+- **explain a block** (`PreToolUse` with `exit 2` sends stderr to Claude).
 
 Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration lives in `~/.claude/settings.json`.
 
@@ -14,24 +14,25 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 
 | Script | Event | Type | Purpose |
 |--------|-------|------|---------|
-| [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **Blocking** | Refuses `git commit`, `git push`, `git filter-repo`, `git reset --hard`, etc. — human approval required |
+| [`block-dangerous-git.sh`](../hooks/block-dangerous-git.sh) | PreToolUse: Bash | **Blocking** | Refuses `git commit`, `git push`, `git filter-repo`, `git reset --hard`, etc. — commit/push are always manual |
 | [`session-start-ticket-context.sh`](../hooks/session-start-ticket-context.sh) | SessionStart | Annotates context | When the branch matches a Jira-style ticket pattern, surfaces that ticket's docs. Prefers a shared ticket-docs root — set `$TICKET_DOCS_ROOT`, or let it find a sibling `issue/` by walking up — and otherwise falls back to matching files in `.plans/`, `.handoffs/`, `.research/` |
 
 ## Hook event model (quick reference)
 
-| Event | Fires when | Stdout goes to | Blocking? |
-|-------|-----------|----------------|-----------|
-| `PreToolUse` | Before a tool runs | (ignored unless `exit ≠ 0`) | Yes — non-zero exit cancels the tool call |
-| `Stop` | After Claude's turn ends | Appended to Claude's next context | No |
-| `SessionStart` | Start of a new session | Appended to session context | No |
+| Event | Fires when | Behavior used here |
+|-------|------------|--------------------|
+| `PreToolUse` | Before a tool runs | `exit 2` blocks the tool call; stderr explains why. `exit 0` without a JSON decision leaves normal permissions in effect. |
+| `SessionStart` | Start of a session | Plain-text stdout adds context; the hook does not block session start. |
+
+Other non-zero exit codes do not block by themselves. `Stop` can prevent stopping with `exit 2`, but this repo does not register a `Stop` hook. See the [official hook reference](https://code.claude.com/docs/en/hooks#exit-code-output).
 
 ## Conventions
 
 - Shebang: `#!/usr/bin/env bash`.
 - `PreToolUse: Bash` hooks read the tool input as JSON on stdin — use `jq -r '.tool_input.command'` to extract the command.
 - Keep hooks fast (< ~100ms). They run on every matched tool call.
-- Guard against missing dependencies (`command -v jq >/dev/null || exit 0`) so a missing tool can't break the session.
-- Echo Claude-facing hints to **stdout**; echo operator-facing warnings to **stderr**.
+- The Git guard exits 2 if jq/Python/shfmt is unavailable or inspection fails. Do not replace this with an `exit 0` fallback. The informational session hook exits 0 when no matching context exists.
+- Output handling depends on the event and exit code: use stdout for session context and stderr for a blocked Git command’s reason.
 
 ## Adding a new hook
 
@@ -51,5 +52,7 @@ Linked into `~/.claude/hooks/` by `install.sh`; the actual hook registration liv
 
 ## Why these specific hooks exist
 
-- **`block-dangerous-git.sh`** — global memory rule: git commit and push require human approval. The hook enforces this even if a session prompt forgets.
+- **`block-dangerous-git.sh`** — global memory rule: git commit and push are always run manually by the user, even after approval. The hook enforces this even if a session prompt forgets.
 - **`session-start-ticket-context.sh`** — auto-resumes ticket context so the user doesn't have to remember to attach the ticket's docs. Works whether those docs live in the repo or in a shared per-ticket directory outside it.
+
+The Git guard requires Python 3, jq, and [shfmt 3](https://github.com/mvdan/sh#shfmt) (`brew install shfmt` on macOS). Keep `git-command-guard.py` beside the shell hook when copying it manually. It uses shfmt's Bash syntax tree without executing the input: comments, redirects, and quoted heredoc bodies are distinguished from commands, including nested substitutions. Dynamic executable names, Git operations, and shell `-c` scripts are rejected when they cannot be inspected literally. Aliases and external scripts still require execution-level controls for complete coverage. A missing or failing parser blocks execution with exit code 2.

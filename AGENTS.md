@@ -25,7 +25,7 @@ Keep it tight — it's always in context.
 - **Neglect** — the copy is just stale. Fix: `cp commands/<name>.md plugins/<pack>/commands/`.
 - **Deliberate** — `commands/` carries company-only workspace routing (`$MAILWORK_ROOT`, `mailFramework/`) that must not ship publicly, so the older-looking copy is correct. No `commands/` file is in this state today (`scripts/jira-daily-setup.sh` is), so treat it as the rarer case.
 
-Run `bash scripts/check-plugin-sync.sh` to tell them apart — deliberate divergences are registered there with a reason, so anything it flags is genuine neglect. Register new divergences instead of syncing them away.
+Run `bash scripts/check-plugin-sync.sh` to tell them apart — deliberate divergences are registered there with a reason, so anything it flags is genuine neglect. Register new divergences instead of syncing them away. The checker also compares skill and agent copies and detects missing custom agents referenced by commands.
 
 ## Setup & plugin install
 
@@ -34,7 +34,7 @@ Run `bash scripts/check-plugin-sync.sh` to tell them apart — deliberate diverg
 ./install.sh
 
 # 플러그인 마켓플레이스로 설치
-/plugin marketplace add mskim/Agcoco
+/plugin marketplace add bradykim7/Agcoco
 /plugin install engineering-skills@agcoco
 /plugin install workflow@agcoco
 ```
@@ -184,6 +184,8 @@ For **any HTML/CSS/frontend UI work** (building a page, component, landing page,
 - If you write 200 lines and it could be 50, rewrite it.
 
 ### 3. Surgical Changes
+
+- Commits and pushes are always performed manually by the user. Never execute them, including after workflow approval.
 
 **Touch only what you must. Clean up only your own mess.**
 

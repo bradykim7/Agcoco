@@ -20,6 +20,7 @@ import anthropic
 # 상위 디렉토리에서 shared 모듈 import
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.global_policy import GLOBAL_AGENT_POLICY
+from shared.schema import validate_schema
 from document_summarizer.prompt import DOCUMENT_SUMMARIZER_PROMPT, DOCUMENT_SUMMARIZER_SCHEMA
 
 # ---------------------------------------------------------------------------
@@ -53,20 +54,6 @@ def parse_json_response(text: str) -> dict:
         text = "\n".join(lines[1:-1]).strip()
 
     return json.loads(text)
-
-
-# ---------------------------------------------------------------------------
-# 스키마 검증 헬퍼
-# ---------------------------------------------------------------------------
-
-def validate_schema(data: dict) -> list[str]:
-    """
-    필수 필드가 모두 있는지 간단히 검증합니다.
-    누락된 필드 목록을 반환합니다.
-    """
-    required = DOCUMENT_SUMMARIZER_SCHEMA["required"]
-    missing = [field for field in required if field not in data]
-    return missing
 
 
 # ---------------------------------------------------------------------------
@@ -138,9 +125,7 @@ Analyze the document above and return the result as JSON only.
         raise
 
     # 스키마 검증
-    missing_fields = validate_schema(result)
-    if missing_fields:
-        print(f"[Warning] 누락된 필드: {missing_fields}")
+    validate_schema(result, DOCUMENT_SUMMARIZER_SCHEMA)
 
     return result
 

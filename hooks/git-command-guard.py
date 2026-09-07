@@ -1,0 +1,1 @@
+../skills/misc/git-guardrails-claude-code/scripts/git-command-guard.py

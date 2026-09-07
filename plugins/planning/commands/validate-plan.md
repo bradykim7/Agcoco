@@ -175,5 +175,5 @@ make build && make test && make lint
 /iterate-plan 피드백          ← 2. 계획 수정 (반복)
 /implement-plan               ← 3. 계획 구현
 /validate-plan                ← 4. 구현 검증     ← 지금 여기
-/workfinish                   ← 5. 커밋 + PR
+/workfinish                   ← 5. 커밋 메시지 추천 + PR 설명
 ```

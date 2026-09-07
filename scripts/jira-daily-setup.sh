@@ -57,7 +57,12 @@ info "node bin 디렉토리: $NODE_BIN_DIR"
 if [[ ! -f "$HOME/.claude/commands/jira-daily.md" ]]; then
     error "/jira-daily 슬래시 커맨드가 없습니다."
     error "Agcoco install.sh 를 먼저 실행해주세요:"
-    error "  cd \"$(dirname \"$(readlink "$HOME/.claude/CLAUDE.md")\")\" && ./install.sh"
+    AGCOCO_TARGET=$(readlink "$HOME/.claude/CLAUDE.md" 2>/dev/null || true)
+    if [[ -n "$AGCOCO_TARGET" ]]; then
+        error "  cd \"$(dirname "$AGCOCO_TARGET")\" && ./install.sh"
+    else
+        error "  (Agcoco 리포 디렉토리에서) ./install.sh"
+    fi
     exit 1
 fi
 info "/jira-daily 슬래시 커맨드 확인"
@@ -116,9 +121,9 @@ for t in "${TIMES[@]}"; do
         error "잘못된 시간 형식: $t (HH:MM 이어야 함)"
         exit 1
     fi
-    HOUR="${BASH_REMATCH[1]}"
-    MIN="${BASH_REMATCH[2]}"
-    if (( HOUR < 0 || HOUR > 23 || MIN < 0 || MIN > 59 )); then
+    HOUR=$((10#${BASH_REMATCH[1]}))
+    MIN=$((10#${BASH_REMATCH[2]}))
+    if (( HOUR > 23 || MIN > 59 )); then
         error "시간 범위 오류: $t"
         exit 1
     fi

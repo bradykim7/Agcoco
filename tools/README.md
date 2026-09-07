@@ -18,11 +18,12 @@ Each tool file exports four variables:
 ```
 for each tools/*.sh (excluding _-prefixed):
     source the file → load TOOL_NAME, TOOL_CMD, TOOL_DIR, TOOL_SYMLINKS
+    if TOOL_SETUP is defined → run it (before CLI detection); log failures and continue
     if `command -v $TOOL_CMD` fails → log "미설치, 건너뜀" and continue
     mkdir -p $TOOL_DIR if missing
     for each "target=source" in TOOL_SYMLINKS:
         if $DOTFILES_DIR/source missing → warn and skip
-        backup existing non-symlink at $TOOL_DIR/target → .bak
+        backup existing non-symlink → first free .bak, .bak.1, .bak.2, … (preserve older backups)
         remove existing symlink at $TOOL_DIR/target
         ln -s $DOTFILES_DIR/source $TOOL_DIR/target
     unset variables for next iteration

@@ -33,7 +33,7 @@
     {
       "name": "claude-usage",
       "source": "./plugins/claude-usage",
-      "description": "Claude Code 사용량 분석 — collect, analyze, report"
+      "description": "Claude Code 사용량 분석 — collect, analyze"
     }
   ]
 }
