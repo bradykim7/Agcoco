@@ -163,7 +163,7 @@ Tool-agnostic — `install.sh` runs a generic loop over `tools/*.sh`, auto-detec
 
 | File | Tool | Detection | Symlinks created |
 |---|---|---|---|
-| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
+| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `WRITING.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (same SKILL.md format) |
 | `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | none — bootstrapped through the adapter's `TOOL_SETUP` hook |
 | `tools/ponytail.sh` | Ponytail plugin | `command -v claude` | none — installed from the plugin marketplace by `TOOL_SETUP` |

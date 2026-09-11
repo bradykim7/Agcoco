@@ -32,6 +32,7 @@ agcoco/              ← 이 레포 (한 곳에 clone)
 ~/.claude/                   ← Claude Code 글로벌 디렉토리
 ├── CLAUDE.md     → agcoco/AGENTS.md
 ├── DESIGN.md     → agcoco/DESIGN.md
+├── WRITING.md    → agcoco/WRITING.md
 ├── commands/     → agcoco/commands/
 ├── agents/       → agcoco/agents/claude-code/
 ├── skills/       → agcoco/skills/

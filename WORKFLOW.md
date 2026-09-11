@@ -369,6 +369,7 @@ bash scripts/check-plugin-sync.sh
 ├── AGENTS.md                ← 글로벌 에이전트 메모리 (→ ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md)
 ├── CLAUDE.md                ← AGENTS.md 심링크
 ├── DESIGN.md                ← HTML/프론트엔드 디자인 시스템
+├── WRITING.md               ← 산문 스타일 가이드 (AI 티 나는 글 방지)
 ├── commands/                ← 커스텀 커맨드 → ~/.claude/commands/
 ├── agents/claude-code/      ← 서브에이전트 정의 → ~/.claude/agents/
 ├── skills/                  ← 스킬. <category>/<name>/SKILL.md 로 분류하고

@@ -163,7 +163,7 @@ Git 차단기는 Bash, jq, Python 3, [shfmt 3](https://github.com/mvdan/sh#shfmt
 
 | 파일 | 도구 | 감지 | 생성 심링크 |
 |------|------|------|-------------|
-| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
+| `tools/claude.sh` | Claude Code | `command -v claude` | `~/.claude/CLAUDE.md` → `AGENTS.md`, `DESIGN.md`, `WRITING.md`, `commands`, `agents`, `skills`, `hooks`, `settings.json` |
 | `tools/codex.sh` | Codex CLI | `command -v codex` | `~/.codex/AGENTS.md` → `AGENTS.md`, `skills` (동일 SKILL.md 포맷) |
 | `tools/codegraph.sh` | CodeGraph MCP | `command -v codegraph` | 없음 — 어댑터의 `TOOL_SETUP` 훅으로 부트스트랩 |
 | `tools/ponytail.sh` | Ponytail 플러그인 | `command -v claude` | 없음 — `TOOL_SETUP` 이 플러그인 마켓플레이스로 설치 |
