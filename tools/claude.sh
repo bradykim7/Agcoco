@@ -9,6 +9,7 @@ TOOL_DIR="$HOME/.claude"
 TOOL_SYMLINKS=(
     "CLAUDE.md=AGENTS.md"
     "DESIGN.md=DESIGN.md"
+    "WRITING.md=WRITING.md"
     "commands=commands"
     "agents=agents/claude-code"
     "skills=skills"

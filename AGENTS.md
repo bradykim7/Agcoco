@@ -154,6 +154,14 @@ For **any HTML/CSS/frontend UI work** (building a page, component, landing page,
 - This is the default, not a straitjacket: if the user asks for a different look or the project clearly has its own system, follow that instead and say so.
 - If `~/.claude/DESIGN.md` isn't present (install.sh not run), skip silently — don't error.
 
+## Prose style
+
+For **any prose deliverable** (문서, README, PR 설명, 커밋 본문, 리포트, 기사), read `~/.claude/WRITING.md` first and follow it. 목적은 AI가 쓴 티 나는 글을 만들지 않는 것.
+
+- 대상은 내가 새로 쓰는 산문이다 — 사용자가 이미 쓴 산문을 요청 없이 고치지 않는다 (규칙 3 우선).
+- 사용자가 다른 톤을 요구하거나 프로젝트에 자체 스타일이 있으면 그쪽을 따르고, 따랐다고 말한다.
+- `~/.claude/WRITING.md`가 없으면 (install.sh 미실행) 조용히 건너뛴다 — 에러 내지 않는다.
+
 ## Anti-patterns to avoid
 
 - Don't spawn agents for trivial work (single file read, simple grep) — call the tool directly.
