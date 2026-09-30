@@ -39,8 +39,7 @@ Claude Code 슬래시 커맨드. [`commands/`](../commands/) 의 각 `.md` 파�
 ### 세션
 | 커맨드 | 용도 |
 |--------|------|
-| [`/handoff`](../commands/handoff.md) | 다음 세션이 이어 받을 수 있도록 컨텍스트 보존 |
-| [`/resume-handoff`](../commands/resume-handoff.md) | 핸드오프 문서에서 작업 재개 |
+| [`/export-context`](../commands/export-context.md) | 다른 머신·에이전트가 이어받을 수 있게 세션 컨텍스트를 마크다운으로 내보냄 |
 
 ### Claude 사용량
 | 커맨드 | 용도 |

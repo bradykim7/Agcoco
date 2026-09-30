@@ -13,7 +13,7 @@
     {
       "name": "workflow",
       "source": "./plugins/workflow",
-      "description": "핵심 작업 커맨드 — workfinish, debug, research, ask-codex, handoff, resume-handoff"
+      "description": "핵심 작업 커맨드 — workfinish, debug, research, ask-codex, export-context"
     },
     {
       "name": "planning",

@@ -39,8 +39,7 @@ Slash commands for Claude Code. Each `.md` file under [`commands/`](../commands/
 ### Session
 | Command | Purpose |
 |---------|---------|
-| [`/handoff`](../commands/handoff.md) | Preserve session context so a future session can resume |
-| [`/resume-handoff`](../commands/resume-handoff.md) | Restore context from a handoff doc and continue |
+| [`/export-context`](../commands/export-context.md) | Export session context as Markdown so another machine or agent can pick it up |
 
 ### Claude usage
 | Command | Purpose |

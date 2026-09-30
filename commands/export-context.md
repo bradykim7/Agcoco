@@ -1,12 +1,13 @@
 ---
-description: 세션 인수인계 문서 작성 — 다음 세션에서 이어서 작업할 수 있도록 컨텍스트 보존
+description: 작업 컨텍스트를 마크다운으로 내보내기 — 다른 머신이나 다른 에이전트(Codex 등)가 이어받을 수 있게 보존
 allowed-tools: Read, Glob, Grep, Bash(git log:*), Bash(git diff:*), Bash(git status:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(date:*), Bash(ls:*), Write
 argument-hint: [설명 또는 생략]
 ---
 
-# Handoff (세션 인수인계)
+# Export Context (다른 머신·에이전트로 인계)
 
-현재 세션의 작업 컨텍스트를 문서로 압축하여, 다음 세션에서 이어서 작업할 수 있게 합니다.
+현재 세션의 작업 컨텍스트를 문서로 압축하여, 다른 머신이나 다른 에이전트가 이어서 작업할 수 있게 합니다.
+같은 도구로 같은 머신에서 이어가는 거라면 이 커맨드 대신 `claude --resume` / `codex resume`을 씁니다.
 humanlayer의 create_handoff 워크플로우에서 영감을 받았습니다.
 
 ---
@@ -92,8 +93,9 @@ status: handoff
 ## 완료 시 출력
 
 ```
-핸드오프 문서 작성 완료!
+컨텍스트 내보내기 완료: .handoffs/YYYY-MM-DD_HH-MM-SS_description.md
 
-다음 세션에서 아래 명령으로 이어서 작업할 수 있습니다:
-/resume-handoff .handoffs/YYYY-MM-DD_HH-MM-SS_description.md
+.handoffs/는 gitignore 대상이라 다른 머신으로는 파일을 직접 옮겨야 합니다.
+받는 쪽 새 세션에서 이렇게 요청하세요:
+"이 문서 읽고, 적힌 상태를 현재 코드와 대조한 뒤 이어서 작업해줘: .handoffs/YYYY-MM-DD_HH-MM-SS_description.md"
 ```

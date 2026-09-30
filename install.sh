@@ -108,7 +108,7 @@ $DIR_TREE
 CLAUDEEOF
 
         # 디렉토리는 미리 만들지 않는다 — .handoffs/.plans/.research 는
-        # /handoff·/research·/create-plan 이 실제로 쓸 때 생성된다.
+        # /export-context·/research·/create-plan 이 실제로 쓸 때 생성된다.
         # 커밋 사고만 막도록 .gitignore 패턴은 미리 등록한다.
         GITIGNORE="$TARGET_DIR/.gitignore"
         if [ -f "$GITIGNORE" ]; then
@@ -375,8 +375,7 @@ echo "  /research           - 코드베이스 구조적 탐색"
 echo "  /debug              - 구조적 디버깅 (병렬 조사)"
 echo ""
 echo "  === 세션 관리 ==="
-echo "  /handoff            - 세션 인수인계 문서 작성"
-echo "  /resume-handoff     - 핸드오프에서 작업 재개"
+echo "  /export-context     - 다른 머신·에이전트로 넘길 인수인계 문서 작성"
 echo ""
 echo "  === 테스트 ==="
 echo "  /affected-endpoints - 영향받는 엔드포인트 추적"

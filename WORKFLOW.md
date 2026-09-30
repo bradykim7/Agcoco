@@ -33,8 +33,7 @@
 
 | 커맨드 | 용도 | 입력 예시 |
 |--------|------|-----------|
-| `/handoff` | 세션 인수인계 문서 작성 | `/handoff` |
-| `/resume-handoff` | 핸드오프에서 작업 재개 | `/resume-handoff .handoffs/2026-04-08_14-30-00_desc.md` |
+| `/export-context` | 다른 머신·에이전트로 넘길 인수인계 문서 작성 | `/export-context` |
 
 ### 테스트 커맨드
 
@@ -100,8 +99,7 @@ git checkout -b feature/WM-XXXXX
 /validate-plan                ← 4. 구현 결과 전체 검증
 /debug 에러 설명              ←    문제 발생 시 병렬 조사
 /workfinish                   ← 5. 커밋 메시지 추천 + PR 설명 생성
-/handoff                      ← 6. 세션 종료 시 인수인계
-/resume-handoff               ←    다음 세션에서 이어서
+/export-context               ← 6. 다른 머신·에이전트로 넘길 때 인수인계
 ```
 
 ### 코드베이스 이해
@@ -149,8 +147,8 @@ Claude (Opus):
 | `codebase-analyzer` | 코드 구현 상세 분석 (데이터 흐름, 로직) | `/create-plan`, `/research`, `/debug` |
 | `codebase-locator` | 파일/컴포넌트 위치 탐색 (Super Grep) | `/create-plan`, `/research`, `/implement-plan`, `/debug` |
 | `codebase-pattern-finder` | 유사 구현/패턴 찾기 + 코드 예시 | `/create-plan`, `/research`, `/implement-plan` |
-| `docs-locator` | 과거 문서 탐색 (.plans/.research/.handoffs/) | `/create-plan`, `/research`, `/resume-handoff`, `/implement-plan`, `/iterate-plan` |
-| `docs-analyzer` | 과거 문서 인사이트 추출 (의사결정, 제약) | `/resume-handoff`, `/iterate-plan` |
+| `docs-locator` | 과거 문서 탐색 (.plans/.research/.handoffs/) | `/create-plan`, `/research`, `/implement-plan`, `/iterate-plan` |
+| `docs-analyzer` | 과거 문서 인사이트 추출 (의사결정, 제약) | `/iterate-plan` |
 | `web-search-researcher` | 웹 검색으로 최신 정보 조사 | 외부 API/라이브러리 정보 필요할 때 |
 | `architecture-review` | 아키텍처 제안 검토 & 리스크 분석 | 설계 문서 리뷰 시 |
 | `endpoint-analysis` | API 엔드포인트 동작/계약 분석 | `/validate-plan`, 엔드포인트 분석 시 |

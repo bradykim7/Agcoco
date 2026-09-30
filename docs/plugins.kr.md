@@ -18,7 +18,7 @@
 | 플러그인 | 구성 | 용도 |
 |----------|------|------|
 | [`planning`](../plugins/planning/) | commands + agents | 계획 라이프사이클 — `create-plan`, `implement-plan`, `iterate-plan`, `validate-plan` + 서브에이전트 8개 동봉 |
-| [`workflow`](../plugins/workflow/) | commands + agents | 핵심 메타 — `workfinish`, `debug`, `research`, `ask-codex`, `handoff`, `resume-handoff` + 서브에이전트 5개 동봉 |
+| [`workflow`](../plugins/workflow/) | commands + agents | 핵심 메타 — `workfinish`, `debug`, `research`, `ask-codex`, `export-context` + 서브에이전트 5개 동봉 |
 | [`testing`](../plugins/testing/) | commands | 영향 엔드포인트 추적 — `affected-endpoints` |
 | [`git-tools`](../plugins/git-tools/) | commands + skills | 커밋 & PR — `commit-mailplug`, `commit-suggest`, `pr-description` + `git-guardrails`, `setup-pre-commit` |
 | [`engineering-skills`](../plugins/engineering-skills/) | skills | 엔지니어링 워크플로우 스킬 (11개) — `setup-matt-pocock-skills`, `diagnose`, `tdd`, `triage`, `to-prd`, `to-issues`, `zoom-out`, `improve-codebase-architecture`, `prototype`, `grill-with-docs`, `grill-me` |

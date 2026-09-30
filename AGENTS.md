@@ -97,8 +97,7 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - `pr-review-assistant` (agent, A) — "review this PR", "PR 리뷰", "find risks in my changes"
 
 ### Session
-- `/handoff` (cmd, A) — "handoff this session", "인수인계 문서 만들어", "save context"
-- `/resume-handoff` (cmd, A) — "resume", "이어서 작업", "pick up where I left off"
+- `/export-context` (cmd, A) — "handoff this session", "export context", "다른 머신으로 넘길래", "인수인계 문서 만들어"
 
 ### Claude usage
 - `/claude-usage-collect` (cmd, A) — "collect my usage", "내 사용량 추출"
@@ -137,7 +136,7 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 
 - **`/debug` vs `diagnose`** — `/debug` for broad parallel investigation when the bug is unknown. `diagnose` (skill) for hard-to-reproduce bugs needing reproduce → minimize → instrument loop. If user names the symptom but not the cause, lean `/debug`. If they say "diagnose this", lean `diagnose`.
 - **`/commit-suggest` vs `/commit-mailplug`** — `/commit-mailplug` if repo follows team ticket convention (TKT-XXX) or commits are mostly Korean. Otherwise `/commit-suggest`. When unclear, ask once.
-- **`/handoff` (command) only** — there is no `handoff` skill (deleted as duplicate). Always use `/handoff`, paired with `/resume-handoff`.
+- **`/export-context` vs native resume** — same tool on the same machine → `claude --resume` / `codex resume`; `/export-context` only when moving to another machine or agent. There is no resume command: when the user says "이어서 작업" with a `.handoffs/` path, read that doc, check its claims against the current code, then continue.
 - **`/create-plan` vs `grill-with-docs` + `to-prd` + `to-issues`** — `/create-plan` is one-shot and faster. The skill chain is incremental and produces persistent artifacts (PRDs + issues). Ad-hoc planning → command; formal scoping → skill chain.
 - **`/workfinish` vs piecewise `/commit-suggest` + `/pr-description`** — `/workfinish` runs both. Use it on "wrap up" / "마무리". Use the individual commands when user asks for just one.
 

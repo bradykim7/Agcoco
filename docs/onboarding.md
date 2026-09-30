@@ -54,11 +54,11 @@ agcoco/              ← 이 레포 (한 곳에 clone)
 commands/
 ├── create-plan.md       ← /create-plan 으로 호출됨
 ├── implement-plan.md    ← /implement-plan 으로 호출됨
-├── handoff.md           ← /handoff 로 호출됨
+├── export-context.md    ← /export-context 로 호출됨
 └── ...
 ```
 
-- **파일명 = 커맨드 이름**: `handoff.md` → `/handoff`
+- **파일명 = 커맨드 이름**: `export-context.md` → `/export-context`
 - **트리거 방법**: Claude Code 채팅에서 `/커맨드이름` 입력
 - **동작 방식**: `.md` 파일 안의 지시문을 Claude가 읽고 그대로 수행
 - **구조**:
@@ -174,8 +174,7 @@ cd ~/agcoco
 
 | 커맨드 | 언제 쓰나 |
 |--------|----------|
-| `/handoff` | 오늘 작업을 중단하고 내일 이어가야 할 때 |
-| `/resume-handoff` | 이전 세션의 핸드오프에서 작업을 재개할 때 |
+| `/export-context` | 다른 머신이나 다른 에이전트(Codex 등)에서 이어가야 할 때. 같은 머신이면 `claude --resume` / `codex resume` |
 
 ### 테스트 & 검증
 
@@ -235,8 +234,8 @@ Claude Code 자체의 사용량 (토큰/모델/세션/비용)을 집계/분석�
 
 | 에이전트 | 하는 일 | 호출하는 커맨드 |
 |----------|--------|---------------|
-| `docs-locator` | 과거 계획서/리서치/핸드오프 검색 | create-plan, research, resume-handoff, implement-plan, iterate-plan |
-| `docs-analyzer` | 과거 문서에서 인사이트 추출 | resume-handoff, iterate-plan |
+| `docs-locator` | 과거 계획서/리서치/핸드오프 검색 | create-plan, research, implement-plan, iterate-plan |
+| `docs-analyzer` | 과거 문서에서 인사이트 추출 | iterate-plan |
 
 ### 리뷰 & 분석 에이전트
 
@@ -280,11 +279,11 @@ Claude (Opus):
 
 /implement-plan                        ← Phase 1 구현
 /debug 결제 API 500 에러              ← 문제 발생 시 조사
-/handoff                              ← 퇴근 전 인수인계 문서 작성
+/export-context                       ← 다른 머신에서 이어갈 거면 인수인계 문서 작성
 
 ── Day 2 오전 ──
 
-/resume-handoff                       ← 어제 컨텍스트 복원
+claude --resume                       ← 같은 머신이면 어제 세션 그대로 재개
 /implement-plan                       ← Phase 2 이어서 구현
 /validate-plan                        ← 구현 결과 전체 검증
 /workfinish                           ← 커밋 메시지 추천 + PR 설명 생성

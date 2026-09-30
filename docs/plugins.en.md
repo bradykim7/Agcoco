@@ -18,7 +18,7 @@ The top-level [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.
 | Plugin | Contents | Purpose |
 |--------|----------|---------|
 | [`planning`](../plugins/planning/) | commands + agents | Plan lifecycle — `create-plan`, `implement-plan`, `iterate-plan`, `validate-plan` + 8 bundled subagents |
-| [`workflow`](../plugins/workflow/) | commands + agents | Core meta commands — `workfinish`, `debug`, `research`, `ask-codex`, `handoff`, `resume-handoff` + 5 bundled subagents |
+| [`workflow`](../plugins/workflow/) | commands + agents | Core meta commands — `workfinish`, `debug`, `research`, `ask-codex`, `export-context` + 5 bundled subagents |
 | [`testing`](../plugins/testing/) | commands | Affected-endpoint tracing — `affected-endpoints` |
 | [`git-tools`](../plugins/git-tools/) | commands + skills | Commit & PR — `commit-mailplug`, `commit-suggest`, `pr-description` + `git-guardrails`, `setup-pre-commit` |
 | [`engineering-skills`](../plugins/engineering-skills/) | skills | Engineering workflow skills (11) — `setup-matt-pocock-skills`, `diagnose`, `tdd`, `triage`, `to-prd`, `to-issues`, `zoom-out`, `improve-codebase-architecture`, `prototype`, `grill-with-docs`, `grill-me` |

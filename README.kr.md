@@ -79,7 +79,7 @@ cd ~/agcoco
 |----------|--------|
 | **계획 라이프사이클** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
 | **리서치 & 디버그** | `/research`, `/debug`, `/ask-codex` |
-| **세션** | `/handoff`, `/resume-handoff` |
+| **세션** | `/export-context` |
 | **테스트** | `/affected-endpoints` |
 | **커밋 & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude 사용량** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
@@ -183,12 +183,12 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 디스크 위의 플레인 마크다운이 메모리. 계획서, 리서치 노트, 핸드오프가 파일로 존재해 다음 세션, 다음 브랜치, 다른 머신에서도 에이전트가 읽을 수 있음 — 컨텍스트가 채팅 윈도우를 넘어 생존.
 
 ```
-  세션 1 — /research → /create-plan → /handoff
+  세션 1 — /research → /create-plan → /export-context
       │
       ▼ 기록
   .research/*.md · .plans/*.md · .handoffs/*.md
       │
-      ▼ /resume-handoff · SessionStart 훅
+      ▼ docs-locator · SessionStart 훅
   세션 2 — 새 대화 · 새 브랜치 · 다른 머신
       │
       └─▶ 같은 파일에 이어서 기록 (맨 위로 순환)
@@ -200,7 +200,7 @@ $EDITOR tools/<your-tool>.sh    # 4개 변수 입력: TOOL_NAME, TOOL_CMD, TOOL_
 ./install.sh init /path/to/project
 ```
 
-대상 프로젝트에 `CLAUDE.md`를 만들고, `.gitignore`가 이미 있을 때만 `.handoffs/`, `.plans/`, `.research/` 패턴을 추가합니다. `.gitignore`가 없으면 직접 만들고, 주석에만 패턴이 있어 중복으로 판단되는 경우도 실제 제외 여부를 확인하세요. 디렉터리 자체는 `/handoff`·`/research`·`/create-plan` 이 쓸 때 만들어집니다.
+대상 프로젝트에 `CLAUDE.md`를 만들고, `.gitignore`가 이미 있을 때만 `.handoffs/`, `.plans/`, `.research/` 패턴을 추가합니다. `.gitignore`가 없으면 직접 만들고, 주석에만 패턴이 있어 중복으로 판단되는 경우도 실제 제외 여부를 확인하세요. 디렉터리 자체는 `/export-context`·`/research`·`/create-plan` 이 쓸 때 만들어집니다.
 
 ## 검증
 

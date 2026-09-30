@@ -79,7 +79,7 @@ One supervisor plans and merges; the sub-agents it spawns run on cheaper models 
 |----------|----------|
 | **Plan Lifecycle** | `/create-plan`, `/implement-plan`, `/iterate-plan`, `/validate-plan` |
 | **Research & Debug** | `/research`, `/debug`, `/ask-codex` |
-| **Session** | `/handoff`, `/resume-handoff` |
+| **Session** | `/export-context` |
 | **Test** | `/affected-endpoints` |
 | **Commit & PR** | `/workfinish`, `/commit-mailplug`, `/commit-suggest`, `/pr-description` |
 | **Claude Usage** | `/claude-usage-collect`, `/claude-usage-analyze`, `/claude-usage-report` |
@@ -183,12 +183,12 @@ $EDITOR tools/<your-tool>.sh    # fill in 4 vars: TOOL_NAME, TOOL_CMD, TOOL_DIR,
 Plain Markdown on disk is the memory. Plans, research notes, and handoffs all live as files the agent can read on the next session, on the next branch, or from a different machine — context survives the chat window.
 
 ```
-  session 1 — /research → /create-plan → /handoff
+  session 1 — /research → /create-plan → /export-context
       │
       ▼ writes
   .research/*.md · .plans/*.md · .handoffs/*.md
       │
-      ▼ /resume-handoff · SessionStart hook
+      ▼ docs-locator · SessionStart hook
   session 2 — new chat · new branch · another machine
       │
       └─▶ appends to the same files (loops back to the top)
@@ -200,7 +200,7 @@ Plain Markdown on disk is the memory. Plans, research notes, and handoffs all li
 ./install.sh init /path/to/project
 ```
 
-Creates `CLAUDE.md` in the target project and adds `.handoffs/`, `.plans/`, `.research/` patterns only if `.gitignore` already exists. Create it manually if absent, and verify that the paths are ignored: the duplicate check also matches comment text. The directories themselves are made on demand by `/handoff`, `/research`, and `/create-plan`.
+Creates `CLAUDE.md` in the target project and adds `.handoffs/`, `.plans/`, `.research/` patterns only if `.gitignore` already exists. Create it manually if absent, and verify that the paths are ignored: the duplicate check also matches comment text. The directories themselves are made on demand by `/export-context`, `/research`, and `/create-plan`.
 
 ## Verification
 
