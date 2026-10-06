@@ -168,6 +168,16 @@ For **any prose deliverable** (문서, README, PR 설명, 커밋 본문, 리포�
 - Don't invoke a skill the user didn't trigger. Skills fire on user phrasing, not your interpretation.
 - Don't paraphrase command flows; if `/workfinish` exists for a flow, suggest the command, don't reimplement it manually.
 
+## Model & effort tiering
+
+한 세션이 전부 같은 모델·effort 로 돌지 않게 한다. 상속이 기본값이지만, 상속이 낭비인 자리에서는 내려쓴다.
+
+- **서브에이전트** — `agents/claude-code/*.md` 의 `model:` frontmatter 가 정본이다. Agent 툴로 부르면 그 값이 적용되므로 호출부에서 다시 지정하지 않는다.
+- **워크플로 에이전트** — `agent()` 는 메인 루프 모델을 상속하며 위 정의를 **우회한다**. 단계마다 `opts.model` / `opts.effort` 를 명시하거나, 기존 정의를 재사용하려면 `opts.agentType` 을 넘긴다.
+  - grep·수집·기계적 요약 단계 → `model: 'haiku'` 또는 `'sonnet'`, `effort: 'low'`
+  - 판단·검증·합성 단계 → 모델은 상속(생략), 필요하면 `effort: 'high'`
+- **모델 핀 우선순위** — `--model` / `/model` > 프로젝트 `.claude/settings.json` > `~/.claude/settings.json`. 레포별로 다르게 쓰려면 전역이 아니라 프로젝트 파일에 건다.
+
 ## Behavioral guidelines
 
 **Tradeoff:** These bias toward caution over speed. Use judgment for trivial tasks.

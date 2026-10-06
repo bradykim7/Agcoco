@@ -385,6 +385,29 @@ bash scripts/check-plugin-sync.sh
 
 커맨드/에이전트 인벤토리는 위 표들이 정본입니다. 여기서 중복 나열하지 않습니다.
 
+### 모델·effort 레이어
+
+모델은 네 겹으로 정해지고, 아래로 갈수록 우선합니다.
+
+| 레이어 | 위치 | 적용 범위 |
+|--------|------|-----------|
+| 전역 기본 | `settings.json` (→ `~/.claude/settings.json`) | 모든 레포의 모든 세션 |
+| 프로젝트 | `<repo>/.claude/settings.json` | 그 레포의 모든 세션 |
+| 세션 | `claude --model <alias>` / 세션 중 `/model` | 그 세션만 |
+| 에이전트 | `agents/claude-code/*.md` 의 `model:` frontmatter | Agent 툴로 부른 서브에이전트 |
+
+**함정** — 워크플로가 `agent()` 로 띄우는 에이전트는 맨 아래 레이어를 타지 않습니다. 기본 워크플로 서브에이전트를 쓰고 모델은 메인 루프에서 상속하므로, `ultracode` 가 켜져 있으면 작업 대부분이 에이전트별 모델 설정을 우회합니다. 스크립트에서 `opts.model` / `opts.effort` / `opts.agentType` 으로 직접 지정해야 합니다 (AGENTS.md `Model & effort tiering`).
+
+레포마다 다르게 쓰려면 전역 핀을 바꾸지 말고 프로젝트 파일을 만듭니다. `.claude/settings.local.json` 과 달리 `.claude/settings.json` 은 gitignore 대상이 아니라 팀과 공유됩니다.
+
+`<repo>/.claude/settings.json`:
+
+```json
+{
+  "model": "sonnet"
+}
+```
+
 ### 새 환경 설정 (dev server 등)
 
 ```bash
