@@ -30,7 +30,8 @@
   },
   "enabledPlugins": {
     "vercel@claude-plugins-official": false,
-    "claude-md-management@claude-plugins-official": true
+    "claude-md-management@claude-plugins-official": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "learning-opportunities": {
@@ -38,9 +39,26 @@
         "source": "git",
         "url": "https://github.com/DrCatHicks/learning-opportunities.git"
       }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
     }
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "ultracode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.193",
