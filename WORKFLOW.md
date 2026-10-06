@@ -27,7 +27,7 @@
 
 **`/ask-codex` 구조**: R0에서 Claude 서브에이전트와 Codex가 **서로의 답을 모르는 채로** 각자 답하고(앵커링 방지), R1에서 상대 답변만 받아 교차 반론합니다. 이 세션의 Claude는 참가자가 아니라 심판이라 초안을 쓰지 않으며, 합의되지 않은 지점은 한쪽으로 정리하지 않고 양쪽 입장을 병기합니다.
 
-**사전 준비**: `codex` CLI 설치 + 로그인. 모델 미지정 시 `~/.codex/config.toml`의 기본값(`gpt-5.6-sol`)을 사용하며 `--model`로 덮어쓸 수 있습니다. Codex는 `--sandbox read-only`로 현재 디렉토리를 읽으므로, 외부에 노출하면 안 되는 리포에서는 실행 위치를 확인하세요.
+**사전 준비**: `codex` CLI 설치 + 로그인. 모델 미지정 시 커맨드에 고정된 `gpt-5.6-sol`을 사용하며(`~/.codex/config.toml` 기본값은 쓰지 않음) `--model`로 덮어쓸 수 있습니다. Codex는 `--sandbox read-only`로 현재 디렉토리를 읽으므로, 외부에 노출하면 안 되는 리포에서는 실행 위치를 확인하세요.
 
 ### 세션 관리 커맨드
 
@@ -144,11 +144,11 @@ Claude (Opus):
 
 | 에이전트 | 용도 | 자동 호출 시점 |
 |----------|------|---------------|
-| `codebase-analyzer` | 코드 구현 상세 분석 (데이터 흐름, 로직) | `/create-plan`, `/research`, `/debug` |
-| `codebase-locator` | 파일/컴포넌트 위치 탐색 (Super Grep) | `/create-plan`, `/research`, `/implement-plan`, `/debug` |
-| `codebase-pattern-finder` | 유사 구현/패턴 찾기 + 코드 예시 | `/create-plan`, `/research`, `/implement-plan` |
+| `codebase-analyzer` | 코드 구현 상세 분석 (데이터 흐름, 로직) | `/create-plan`, `/research`, `/implement-plan`, `/iterate-plan`, `/validate-plan`, `/debug` |
+| `codebase-locator` | 파일/컴포넌트 위치 탐색 (Super Grep) | `/create-plan`, `/research`, `/implement-plan`, `/iterate-plan`, `/validate-plan`, `/debug`, `/jira-daily` |
+| `codebase-pattern-finder` | 유사 구현/패턴 찾기 + 코드 예시 | `/create-plan`, `/research`, `/implement-plan`, `/iterate-plan` |
 | `docs-locator` | 과거 문서 탐색 (.plans/.research/.handoffs/) | `/create-plan`, `/research`, `/implement-plan`, `/iterate-plan` |
-| `docs-analyzer` | 과거 문서 인사이트 추출 (의사결정, 제약) | `/iterate-plan` |
+| `docs-analyzer` | 과거 문서 인사이트 추출 (의사결정, 제약) | `/research`, `/implement-plan`, `/iterate-plan` |
 | `web-search-researcher` | 웹 검색으로 최신 정보 조사 | 외부 API/라이브러리 정보 필요할 때 |
 | `architecture-review` | 아키텍처 제안 검토 & 리스크 분석 | 설계 문서 리뷰 시 |
 | `endpoint-analysis` | API 엔드포인트 동작/계약 분석 | `/validate-plan`, 엔드포인트 분석 시 |
@@ -374,7 +374,7 @@ bash scripts/check-plugin-sync.sh
 │                              install.sh 가 최상위에 <name> 평탄화 심링크를 생성
 ├── hooks/                   ← PreToolUse / SessionStart 훅 → ~/.claude/hooks/
 ├── plugins/                 ← 플러그인 마켓플레이스 배포본
-├── tools/                   ← 툴별 심링크 레지스트리 (claude.sh, codex.sh, ...)
+├── tools/                   ← 툴별 설치 레지스트리 (claude.sh·codex.sh 는 심링크, codegraph.sh·ponytail.sh 는 TOOL_SETUP 설치 훅)
 ├── scripts/                 ← 독립 셸 헬퍼 (jira-daily-setup.sh 등)
 ├── templates/               ← 프로젝트 템플릿
 ├── docs/                    ← 참고 문서
@@ -395,6 +395,8 @@ bash scripts/check-plugin-sync.sh
 | 프로젝트 | `<repo>/.claude/settings.json` | 그 레포의 모든 세션 |
 | 세션 | `claude --model <alias>` / 세션 중 `/model` | 그 세션만 |
 | 에이전트 | `agents/claude-code/*.md` 의 `model:` frontmatter | Agent 툴로 부른 서브에이전트 |
+
+effort 는 `settings.json` 의 `effortLevel` 이 전역 기본이고, `modelSettings.<모델 ID>.effortLevel` 이 그 모델일 때 덮어씁니다. 실제 값은 `settings.json` 이 정본입니다.
 
 **함정** — 워크플로가 `agent()` 로 띄우는 에이전트는 맨 아래 레이어를 타지 않습니다. 기본 워크플로 서브에이전트를 쓰고 모델은 메인 루프에서 상속하므로, `ultracode` 가 켜져 있으면 작업 대부분이 에이전트별 모델 설정을 우회합니다. 스크립트에서 `opts.model` / `opts.effort` / `opts.agentType` 으로 직접 지정해야 합니다 (AGENTS.md `Model & effort tiering`).
 

@@ -1,6 +1,6 @@
 # Approach A: Git Submodule 방식
 
-> 현재는 Approach B (글로벌 Clone + per-repo symlink)를 사용 중.
+> 현재는 Approach B (글로벌 clone + `~/.claude`·`~/.codex` 로 symlink, 레포별로는 `install.sh init` 으로 CLAUDE.md 만 생성)를 사용 중.
 > 향후 팀 공유가 필요할 때 이 방식으로 전환 검토.
 
 ## 구조
@@ -10,7 +10,7 @@ my-project/
 ├── .claude-setting/     ← git submodule (agcoco)
 ├── .claude/
 │   ├── commands/ → .claude-setting/commands/  (symlink)
-│   ├── agents/   → .claude-setting/agents/    (symlink)
+│   ├── agents/   → .claude-setting/agents/claude-code/  (symlink)
 │   └── CLAUDE.md        ← 프로젝트별 커스텀 (템플릿에서 생성)
 └── src/
 ```

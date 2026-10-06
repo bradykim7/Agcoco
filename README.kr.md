@@ -73,7 +73,7 @@ cd ~/agcoco
 
 ## 포함 내용
 
-### Commands (18개)
+### Commands (17개)
 
 | 카테고리 | 커맨드 |
 |----------|--------|
@@ -221,7 +221,7 @@ API 호출이나 launchd 등록은 하지 않습니다. 검사 범위는 [Script
 ## 문서
 
 ### 컴포넌트 레퍼런스
-- [슬래시 커맨드](docs/commands.kr.md) ([EN](docs/commands.en.md)) — 카테고리별 18개 커맨드
+- [슬래시 커맨드](docs/commands.kr.md) ([EN](docs/commands.en.md)) — 카테고리별 17개 커맨드
 - [서브 에이전트](docs/agents.kr.md) ([EN](docs/agents.en.md)) — Claude 가 spawn 하는 12개 전문 에이전트
 - [Hooks](docs/hooks.kr.md) ([EN](docs/hooks.en.md)) — 2개 라이프사이클 hook 스크립트
 - [Scripts](docs/scripts.kr.md) ([EN](docs/scripts.en.md)) — 독립 실행 셸·Python 헬퍼

@@ -44,6 +44,8 @@ In this repo, Claude delegates to these agents inside command workflows, using e
 
 If you build a new agent, pick the cheapest tier that gives correct output on your evals.
 
+The frontmatter `model:` applies when the Agent tool spawns the agent. Workflow-script `agent()` calls inherit the main-loop model and bypass it — set `opts.model`/`opts.effort` or pass `opts.agentType`. See [AGENTS.md](../AGENTS.md) "Model & effort tiering".
+
 ## Conventions
 
 - Filename = `name:` field in frontmatter (kebab-case).

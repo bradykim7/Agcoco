@@ -44,6 +44,8 @@ Claude Code 가 `Agent` 도구로 호출하는 전문 에이전트. [`agents/cla
 
 새 에이전트를 만들 때는 평가 통과 가능한 가장 저렴한 등급을 선택하세요.
 
+frontmatter 의 `model:` 은 Agent 툴로 호출할 때 적용됩니다. 워크플로 스크립트의 `agent()` 는 메인 루프 모델을 상속해 이 값을 우회하므로 `opts.model`/`opts.effort` 를 지정하거나 `opts.agentType` 을 넘겨야 합니다. [AGENTS.md](../AGENTS.md) "Model & effort tiering" 참고.
+
 ## 규칙
 
 - 파일명 = frontmatter `name:` 필드 (kebab-case).

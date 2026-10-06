@@ -73,7 +73,7 @@ One supervisor plans and merges; the sub-agents it spawns run on cheaper models 
 
 ## What's Included
 
-### Commands (18)
+### Commands (17)
 
 | Category | Commands |
 |----------|----------|
@@ -221,7 +221,7 @@ Every workflow produces a concrete file or message — not just a chat reply. Co
 ## Docs
 
 ### Component reference
-- [Slash Commands](docs/commands.en.md) ([KR](docs/commands.kr.md)) — 18 commands grouped by category
+- [Slash Commands](docs/commands.en.md) ([KR](docs/commands.kr.md)) — 17 commands grouped by category
 - [Sub-agents](docs/agents.en.md) ([KR](docs/agents.kr.md)) — 12 specialized agents Claude spawns
 - [Hooks](docs/hooks.en.md) ([KR](docs/hooks.kr.md)) — 2 lifecycle hook scripts
 - [Scripts](docs/scripts.en.md) ([KR](docs/scripts.kr.md)) — Standalone shell and Python helpers

@@ -16,7 +16,7 @@ Each subfolder is a category. Each skill is a folder containing `SKILL.md` (fron
 
 ## Install
 
-`./install.sh install` symlinks this directory to `~/.claude/skills`, making every skill invocable in Claude Code.
+`./install.sh install` first regenerates gitignored flat per-skill symlinks (`skills/<name>` → `<category>/<name>`, since Claude Code and Codex scan only one level deep), then links this directory to `~/.claude/skills` and, if Codex is installed, to `~/.codex/skills` and `~/.agents/skills`.
 
 ## Source
 

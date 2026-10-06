@@ -95,6 +95,7 @@ Type legend: **(cmd)** slash command · **(skill)** auto-firing skill · **(agen
 - `/pr-description` (cmd, A) — "PR description", "PR 설명 만들어줘"
 - `/workfinish` (cmd, S) — "wrap up", "마무리하자", "ready to ship", "끝내자"
 - `pr-review-assistant` (agent, A) — "review this PR", "PR 리뷰", "find risks in my changes"
+- `pr-description-generator` (agent, A) — "PR 본문 초안만", "draft PR body from diff" *(standalone; `/pr-description` is the full command flow)*
 
 ### Session
 - `/export-context` (cmd, A) — "handoff this session", "export context", "다른 머신으로 넘길래", "인수인계 문서 만들어"

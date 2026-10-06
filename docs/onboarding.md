@@ -20,7 +20,7 @@
 agcoco/              ← 이 레포 (한 곳에 clone)
 ├── AGENTS.md                ← 모든 AI 에이전트가 공유하는 canonical 컨텍스트 (openclaw 패턴)
 ├── CLAUDE.md → AGENTS.md    ← Claude Code 이름으로 부르는 in-repo symlink
-├── commands/*.md            ← 슬래시 커맨드 정의 (18개)
+├── commands/*.md            ← 슬래시 커맨드 정의 (17개)
 ├── agents/claude-code/*.md  ← AI 서브에이전트 정의 (12개)
 ├── skills/                  ← 자동 발동 스킬 (21개, mattpocock 포팅)
 ├── settings.json            ← 글로벌 설정
@@ -42,6 +42,8 @@ agcoco/              ← 이 레포 (한 곳에 clone)
 ~/.codex/                    ← Codex CLI 글로벌 디렉토리 (설치 시 자동 추가)
 ├── AGENTS.md → agcoco/AGENTS.md
 └── skills/   → agcoco/skills/
+
+~/.agents/skills → agcoco/skills/  ← Codex 공식 개인 스킬 경로 (tools/codex.sh 가 함께 연결)
 
 ~/.<other>/                  ← tools/<name>.sh 추가 시 어떤 AI CLI든 자동 연결
 ```
@@ -226,16 +228,16 @@ Claude Code 자체의 사용량 (토큰/모델/세션/비용)을 집계/분석�
 
 | 에이전트 | 하는 일 | 호출하는 커맨드 |
 |----------|--------|---------------|
-| `codebase-locator` | 파일 위치 찾기 (Super Grep) | create-plan, research, implement-plan, debug |
-| `codebase-analyzer` | 코드 구현 상세 분석 | create-plan, research, debug |
-| `codebase-pattern-finder` | 유사 패턴/예시 탐색 | create-plan, research, implement-plan |
+| `codebase-locator` | 파일 위치 찾기 (Super Grep) | create-plan, research, implement-plan, iterate-plan, validate-plan, debug, jira-daily |
+| `codebase-analyzer` | 코드 구현 상세 분석 | create-plan, research, implement-plan, iterate-plan, validate-plan, debug |
+| `codebase-pattern-finder` | 유사 패턴/예시 탐색 | create-plan, research, implement-plan, iterate-plan |
 
 ### 지식 관리 에이전트
 
 | 에이전트 | 하는 일 | 호출하는 커맨드 |
 |----------|--------|---------------|
 | `docs-locator` | 과거 계획서/리서치/핸드오프 검색 | create-plan, research, implement-plan, iterate-plan |
-| `docs-analyzer` | 과거 문서에서 인사이트 추출 | iterate-plan |
+| `docs-analyzer` | 과거 문서에서 인사이트 추출 | research, implement-plan, iterate-plan |
 
 ### 리뷰 & 분석 에이전트
 
